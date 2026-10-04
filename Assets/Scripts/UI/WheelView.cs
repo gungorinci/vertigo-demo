@@ -11,6 +11,7 @@ namespace VertigoDemo.UI
 
         [SerializeField, HideInInspector] private Image wheelImage;
         [SerializeField, HideInInspector] private Image pointerImage;
+        [SerializeField, HideInInspector] private WheelSliceView[] sliceViews;
 
         // Temporary: lets us see a config in Play mode before GameController exists.
         [SerializeField] private WheelConfig previewConfig;
@@ -19,6 +20,14 @@ namespace VertigoDemo.UI
         {
             wheelImage.sprite = config.WheelSprite;
             pointerImage.sprite = config.IndicatorSprite;
+
+            // Temporary: first reward and min amount, until rewards are rolled per zone.
+            for (int i = 0; i < sliceViews.Length && i < config.Slices.Count; i++)
+            {
+                WheelSlice slice = config.Slices[i];
+                if (slice.RewardPool.Count == 0) continue;
+                sliceViews[i].Show(slice.RewardPool[0].Icon, slice.MinAmount);
+            }
         }
 
         private void Start()
@@ -31,6 +40,7 @@ namespace VertigoDemo.UI
         {
             wheelImage = FindImage(WheelImageName);
             pointerImage = FindImage(PointerImageName);
+            sliceViews = GetComponentsInChildren<WheelSliceView>(true);
         }
 
         private Image FindImage(string childName)
