@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using VertigoDemo.Core;
 using VertigoDemo.Data;
+using VertigoDemo.Game;
 
 namespace VertigoDemo.UI
 {
@@ -16,24 +19,27 @@ namespace VertigoDemo.UI
         // Temporary: lets us see a config in Play mode before GameController exists.
         [SerializeField] private WheelConfig previewConfig;
 
-        public void Show(WheelConfig config)
+       public void Show(WheelConfig config, IReadOnlyList<RolledSlice> slices)
         {
             wheelImage.sprite = config.WheelSprite;
             pointerImage.sprite = config.IndicatorSprite;
 
-            // Temporary: first reward and min amount, until rewards are rolled per zone.
-            for (int i = 0; i < sliceViews.Length && i < config.Slices.Count; i++)
+            for (int i = 0; i < sliceViews.Length && i < slices.Count; i++)
             {
-                WheelSlice slice = config.Slices[i];
-                if (slice.RewardPool.Count == 0) continue;
-                sliceViews[i].Show(slice.RewardPool[0].Icon, slice.MinAmount);
+                RolledSlice slice = slices[i];
+                if (slice.Reward == null) continue;
+                sliceViews[i].Show(slice.Reward.Icon, slice.Amount);
             }
         }
 
-        private void Start()
-        {
-            if (previewConfig != null) Show(previewConfig);
-        }
+       private void Start()
+       {
+            if (previewConfig == null) return;
+       
+            IRandomSource random = new SystemRandomSource();
+            List<RolledSlice> rolled = WheelRoller.Roll(previewConfig, random);
+            Show(previewConfig, rolled);
+       }
 
 #if UNITY_EDITOR
         private void OnValidate()
