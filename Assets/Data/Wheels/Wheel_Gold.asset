@@ -15,35 +15,50 @@ MonoBehaviour:
   wheelSprite: {fileID: 21300000, guid: 7654abc17e6fab14e98011752bd86e5b, type: 3}
   indicatorSprite: {fileID: 21300000, guid: ee714244e0a2215409cf87ab547a149e, type: 3}
   slices:
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
+  - rewardPool:
+    - {fileID: 11400000, guid: a0fbaa10b34c8ba4f8a3b2c28700023e, type: 2}
+    minAmount: 500
+    maxAmount: 1000
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: a1ab32df45cbd57469ef90d592732299, type: 2}
+    - {fileID: 11400000, guid: 6764e4b20ed357d429dc2916d505f230, type: 2}
+    minAmount: 5
+    maxAmount: 10
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 6eb69aa6060d0554fadb9a29bc894fb6, type: 2}
+    - {fileID: 11400000, guid: 2aebe099ec6bacb4bbffec9aebd1d193, type: 2}
+    - {fileID: 11400000, guid: cc4e049e17ef3d64dba552fb9bf1ddc4, type: 2}
+    minAmount: 1
+    maxAmount: 1
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 4f39269599ac9e64b8271543ec7c0fa9, type: 2}
+    minAmount: 1000
+    maxAmount: 2000
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 4a1f520be7fef2e49a2baa73ffd93a97, type: 2}
+    - {fileID: 11400000, guid: 10e54bf433172d043b78a7f9db041e1f, type: 2}
+    minAmount: 1
+    maxAmount: 1
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 46d1facce69f3094db6373a65f6ff6a0, type: 2}
+    - {fileID: 11400000, guid: f818f828555152c49aa4ef70ee3e703a, type: 2}
+    minAmount: 40
+    maxAmount: 80
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: ae236410c7a23034fb440cab50cb4b8f, type: 2}
+    - {fileID: 11400000, guid: 4b1a8054738ecd4449f47e5372950932, type: 2}
+    - {fileID: 11400000, guid: 987be731d2007bc4dae7d604f42ee0d6, type: 2}
+    minAmount: 1
+    maxAmount: 1
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: be3bf11a51af10646bcf189dcfb82944, type: 2}
+    minAmount: 5
+    maxAmount: 10
+    weight: 10

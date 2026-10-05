@@ -18,40 +18,45 @@ MonoBehaviour:
   - rewardPool:
     - {fileID: 11400000, guid: 573686d7d87f87547bb2a0d3b51cb350, type: 2}
     minAmount: 1
-    maxAmount: 10
+    maxAmount: 1
     weight: 10
   - rewardPool:
     - {fileID: 11400000, guid: a0fbaa10b34c8ba4f8a3b2c28700023e, type: 2}
-    minAmount: 1
-    maxAmount: 10
+    minAmount: 10
+    maxAmount: 50
     weight: 10
   - rewardPool:
-    - {fileID: 11400000, guid: a1ab32df45cbd57469ef90d592732299, type: 2}
+    - {fileID: 11400000, guid: a330724bbacd7a1469d865aa09e451a9, type: 2}
+    - {fileID: 11400000, guid: 415cb0ad3026d74448b37031602f0360, type: 2}
+    - {fileID: 11400000, guid: 25b03349974fb064989e934d4ee8d897, type: 2}
     minAmount: 1
-    maxAmount: 10
+    maxAmount: 2
     weight: 10
   - rewardPool:
-    - {fileID: 11400000, guid: c951649b8928ae847a68060f79d0512b, type: 2}
-    minAmount: 1
-    maxAmount: 10
+    - {fileID: 11400000, guid: b7a69182f281ce646ab831b577fab9ff, type: 2}
+    - {fileID: 11400000, guid: 5b60dca988b8d884fbaa787d51a244c0, type: 2}
+    minAmount: 5
+    maxAmount: 15
     weight: 10
   - rewardPool:
+    - {fileID: 11400000, guid: 4f39269599ac9e64b8271543ec7c0fa9, type: 2}
+    minAmount: 20
+    maxAmount: 100
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 107e3dc7a79fdb64fa30bf70927f5ae8, type: 2}
+    minAmount: 1
+    maxAmount: 1
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 4b200c5d76b95b444868b3b172e58762, type: 2}
     - {fileID: 11400000, guid: acd2be72209c2db49bd80b9d8d164e76, type: 2}
     minAmount: 1
-    maxAmount: 10
-    weight: 10
-  - rewardPool:
-    - {fileID: 11400000, guid: 5b60dca988b8d884fbaa787d51a244c0, type: 2}
-    minAmount: 1
-    maxAmount: 10
+    maxAmount: 3
     weight: 10
   - rewardPool:
     - {fileID: 11400000, guid: f6653121a6f503f41900796a6e3d3dbb, type: 2}
-    minAmount: 1
-    maxAmount: 10
-    weight: 10
-  - rewardPool:
-    - {fileID: 11400000, guid: ae236410c7a23034fb440cab50cb4b8f, type: 2}
-    minAmount: 1
-    maxAmount: 10
+    - {fileID: 11400000, guid: 4bfda1494788564458d0dab0adf00b20, type: 2}
+    minAmount: 5
+    maxAmount: 15
     weight: 10

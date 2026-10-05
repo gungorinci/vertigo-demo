@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using VertigoDemo.Core;
 using VertigoDemo.Data;
 using VertigoDemo.Game;
 
@@ -9,15 +8,12 @@ namespace VertigoDemo.UI
 {
     public class WheelView : MonoBehaviour
     {
-        private const string WheelImageName = "ui_image_spin_wheel";
-        private const string PointerImageName = "ui_image_pointer";
+        private const string WheelImageName = "ui_image_spin_wheel_value";
+        private const string PointerImageName = "ui_image_pointer_value";
 
         [SerializeField, HideInInspector] private Image wheelImage;
         [SerializeField, HideInInspector] private Image pointerImage;
         [SerializeField, HideInInspector] private WheelSliceView[] sliceViews;
-
-        // Temporary: lets us see a config in Play mode before GameController exists.
-        [SerializeField] private WheelConfig previewConfig;
 
        public void Show(WheelConfig config, IReadOnlyList<RolledSlice> slices)
         {
@@ -31,15 +27,6 @@ namespace VertigoDemo.UI
                 sliceViews[i].Show(slice.Reward.Icon, slice.Amount);
             }
         }
-
-       private void Start()
-       {
-            if (previewConfig == null) return;
-       
-            IRandomSource random = new SystemRandomSource();
-            List<RolledSlice> rolled = WheelRoller.Roll(previewConfig, random);
-            Show(previewConfig, rolled);
-       }
 
 #if UNITY_EDITOR
         private void OnValidate()

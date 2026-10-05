@@ -15,35 +15,49 @@ MonoBehaviour:
   wheelSprite: {fileID: 21300000, guid: 32cfc03f33e92bb43a41593c15f1f88e, type: 3}
   indicatorSprite: {fileID: 21300000, guid: 8131d1a7f0bdf584d82f77efe62d057a, type: 3}
   slices:
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
-  - rewardPool: []
-    minAmount: 0
-    maxAmount: 0
-    weight: 0
+  - rewardPool:
+    - {fileID: 11400000, guid: a0fbaa10b34c8ba4f8a3b2c28700023e, type: 2}
+    minAmount: 100
+    maxAmount: 200
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: c951649b8928ae847a68060f79d0512b, type: 2}
+    - {fileID: 11400000, guid: 72b4ce69fa74ef54bb43717681038c44, type: 2}
+    minAmount: 3
+    maxAmount: 5
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 28f2516f608759842a4a9c53a262f1fc, type: 2}
+    - {fileID: 11400000, guid: 087ad10a960334f4c8535a240ce9fb62, type: 2}
+    - {fileID: 11400000, guid: a3ccdbc767088eb49a09d6cb9a656922, type: 2}
+    minAmount: 15
+    maxAmount: 30
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 4f39269599ac9e64b8271543ec7c0fa9, type: 2}
+    minAmount: 200
+    maxAmount: 400
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: 666da79507690634ba4618964fff3ae5, type: 2}
+    - {fileID: 11400000, guid: 2e95b7d5844a59f459c71ba80da6e434, type: 2}
+    minAmount: 1
+    maxAmount: 1
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: ba580c06a4fac604785d7defb84dfbdc, type: 2}
+    - {fileID: 11400000, guid: 9a661238b0e3eed41b57a5089d5b21ef, type: 2}
+    minAmount: 2
+    maxAmount: 4
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: f818f828555152c49aa4ef70ee3e703a, type: 2}
+    minAmount: 15
+    maxAmount: 30
+    weight: 10
+  - rewardPool:
+    - {fileID: 11400000, guid: f6653121a6f503f41900796a6e3d3dbb, type: 2}
+    - {fileID: 11400000, guid: 4bfda1494788564458d0dab0adf00b20, type: 2}
+    minAmount: 15
+    maxAmount: 30
+    weight: 10

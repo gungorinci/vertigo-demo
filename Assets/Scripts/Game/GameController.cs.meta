@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 02db2f14faccde241aea1bbcc7b6129e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - normalWheel: {fileID: 11400000, guid: 9e8f0e802b8f3b3489abd1eb25e72707, type: 2}
+  - safeWheel: {fileID: 11400000, guid: 27344816dae852d478046259ca6465fa, type: 2}
+  - superWheel: {fileID: 11400000, guid: 2bccbddfd09eee34db4dde801b196d39, type: 2}
+  - spinButton: {instanceID: 0}
+  - wheelView: {instanceID: 0}
+  - spinAnimator: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
