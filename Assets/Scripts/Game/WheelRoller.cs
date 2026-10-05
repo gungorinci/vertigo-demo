@@ -16,9 +16,16 @@ namespace VertigoDemo.Game
                     ? slice.RewardPool[random.Range(0, slice.RewardPool.Count)]
                     : null;
 
-                int max = slice.MaxAmount < slice.MinAmount ? slice.MinAmount : slice.MaxAmount;
-                int amount = random.Range(slice.MinAmount, max + 1);
-
+                int amount;
+                if (reward != null && reward.IsBomb)
+                {
+                    amount = 1; // a bomb has no amount, always shown as x1
+                }
+                else
+                {
+                    int max = slice.MaxAmount < slice.MinAmount ? slice.MinAmount : slice.MaxAmount;
+                    amount = random.Range(slice.MinAmount, max + 1);
+                }
                 rolled.Add(new RolledSlice(reward, amount, slice.Weight));
             }
 
