@@ -25,8 +25,8 @@ namespace VertigoDemo.UI
         public void ShowIntro(int zone)
         {
             zoneText.text = $"ZONE {zone}";
-            titleText.text = "SPIN TO WIN!";
-            infoText.text = "Avoid the bomb. Every 5th zone is safe: leave there to keep your rewards.";
+            titleText.text = "SPIN TO WIN! REWARDS GROW EVERY ZONE";
+            infoText.text = "<size=85%>Avoid the bomb! Every 5th zone is safe, every 30th is golden. Leave there to keep it all.</size>";
         }
 
         private static string TitleFor(ZoneType type) => type switch
