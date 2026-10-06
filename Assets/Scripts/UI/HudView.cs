@@ -21,6 +21,14 @@ namespace VertigoDemo.UI
             infoText.text = InfoFor(zone, type);
         }
 
+        // Shown before the first spin of a run: the rules in one line.
+        public void ShowIntro(int zone)
+        {
+            zoneText.text = $"ZONE {zone}";
+            titleText.text = "SPIN TO WIN!";
+            infoText.text = "Avoid the bomb. Every 5th zone is safe: leave there to keep your rewards.";
+        }
+
         private static string TitleFor(ZoneType type) => type switch
         {
             ZoneType.Safe => "SILVER SPIN",

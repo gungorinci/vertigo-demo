@@ -38,6 +38,7 @@ namespace VertigoDemo.Game
         private GameSession<RewardData> session;
         private WheelConfig currentConfig;
         private WheelSelector<WheelConfig> wheels;
+        private bool showIntro = true;
 
         private void OnEnable()
         {
@@ -80,7 +81,8 @@ namespace VertigoDemo.Game
             currentConfig = wheels.For(session.ZoneType);
             currentSlices = WheelRoller.Roll(currentConfig, random);
             wheelView.Show(currentConfig, currentSlices);
-            hud.ShowZone(session.Zone, session.ZoneType);
+            if (showIntro) hud.ShowIntro(session.Zone);
+            else hud.ShowZone(session.Zone, session.ZoneType);
         }
 
         private void OnSpinClicked()
@@ -92,6 +94,11 @@ namespace VertigoDemo.Game
 
             int winner = WeightedPicker.Pick(weights, random);
             session.BeginSpin();
+            if (showIntro)
+            {
+                showIntro = false;
+                hud.ShowZone(session.Zone, session.ZoneType);
+            }
             spinAnimator.Spin(winner, currentSlices.Count, random, () => OnSpinFinished(winner));
         }
 
@@ -152,7 +159,11 @@ namespace VertigoDemo.Game
             if (session.CanLeave) session.Leave();
         }
 
-        private void OnRestartClicked() => session.Restart();
+        private void OnRestartClicked()
+        {
+            showIntro = true;
+            session.Restart();
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
