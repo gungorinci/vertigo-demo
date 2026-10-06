@@ -25,6 +25,8 @@ namespace VertigoDemo.Game
         [SerializeField, HideInInspector] private WheelView wheelView;
         [SerializeField, HideInInspector] private WheelSpinAnimator spinAnimator;
         [SerializeField, HideInInspector] private ResultPanelView resultPanel;
+        [SerializeField, HideInInspector] private HudView hud;
+        [SerializeField, HideInInspector] private RewardHudView rewardHud;
 
         private readonly IRandomSource random = new SystemRandomSource();
         private List<RolledSlice> currentSlices;
@@ -50,6 +52,7 @@ namespace VertigoDemo.Game
             session = new GameSession<RewardData>();
             session.ZoneChanged += OnZoneChanged;
             session.RewardChanged += OnRewardChanged;
+            session.RewardsCleared += OnRewardsCleared;
             session.StateChanged += OnStateChanged;
             ShowZone();
             UpdateButtons();
@@ -60,6 +63,7 @@ namespace VertigoDemo.Game
             if (session == null) return;
             session.ZoneChanged -= OnZoneChanged;
             session.RewardChanged -= OnRewardChanged;
+            session.RewardsCleared -= OnRewardsCleared;
             session.StateChanged -= OnStateChanged;
         }
 
@@ -68,7 +72,7 @@ namespace VertigoDemo.Game
             currentConfig = GetConfig(session.ZoneType);
             currentSlices = WheelRoller.Roll(currentConfig, random);
             wheelView.Show(currentConfig, currentSlices);
-            Debug.Log($"Zone {session.Zone} ({session.ZoneType})");
+            hud.ShowZone(session.Zone, session.ZoneType);
         }
 
         private WheelConfig GetConfig(ZoneType type)
@@ -101,8 +105,9 @@ namespace VertigoDemo.Game
 
         private void OnZoneChanged(int zone) => ShowZone();
 
-        private void OnRewardChanged(RewardData reward, int total) =>
-            Debug.Log($"+ {reward.DisplayName}, total {total}");
+        private void OnRewardChanged(RewardData reward, int total) => rewardHud.SetReward(reward, total);
+
+        private void OnRewardsCleared() => rewardHud.Clear();
 
         private void OnStateChanged(SessionState state)
         {
@@ -146,9 +151,11 @@ namespace VertigoDemo.Game
             Transform leave = transform.FindDeep(LeaveButtonName);
             leaveButton = leave != null ? leave.GetComponent<Button>() : null;
             resultPanel = GetComponentInChildren<ResultPanelView>(true);
+            hud = GetComponentInChildren<HudView>(true);
+            rewardHud = GetComponentInChildren<RewardHudView>(true);
 
             if (spinButton == null || leaveButton == null || wheelView == null
-                || spinAnimator == null || resultPanel == null)
+                || spinAnimator == null || resultPanel == null || hud == null || rewardHud == null)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
         }
 #endif
