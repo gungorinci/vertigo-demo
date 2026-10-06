@@ -19,6 +19,8 @@ namespace VertigoDemo.UI
             amountText.text = "x" + amount;
         }
 
+        public RectTransform IconTransform => icon.rectTransform;
+        
 #if UNITY_EDITOR
         private void OnValidate()
         {

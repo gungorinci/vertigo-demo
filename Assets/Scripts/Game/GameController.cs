@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using VertigoDemo.Core;
@@ -19,6 +20,8 @@ namespace VertigoDemo.Game
         [Header("Result panel")]
         [SerializeField] private Sprite loseIcon;
         [SerializeField] private Sprite winIcon;
+        [SerializeField, Min(0f)] private float resultDelay = 1f;
+        [SerializeField, Min(0f)] private float flyDelay = 0.4f;
 
         [SerializeField, HideInInspector] private Button spinButton;
         [SerializeField, HideInInspector] private Button leaveButton;
@@ -27,6 +30,8 @@ namespace VertigoDemo.Game
         [SerializeField, HideInInspector] private ResultPanelView resultPanel;
         [SerializeField, HideInInspector] private HudView hud;
         [SerializeField, HideInInspector] private RewardHudView rewardHud;
+        [SerializeField, HideInInspector] private WheelWinEffect winEffect;
+        [SerializeField, HideInInspector] private RewardFlyEffect rewardFly;
 
         private readonly IRandomSource random = new SystemRandomSource();
         private List<RolledSlice> currentSlices;
@@ -52,8 +57,8 @@ namespace VertigoDemo.Game
             session = new GameSession<RewardData>();
             session.ZoneChanged += OnZoneChanged;
             session.RewardChanged += OnRewardChanged;
-            session.RewardsCleared += OnRewardsCleared;
             session.StateChanged += OnStateChanged;
+            session.RewardsCleared += OnRewardsCleared;
             ShowZone();
             UpdateButtons();
         }
@@ -63,12 +68,13 @@ namespace VertigoDemo.Game
             if (session == null) return;
             session.ZoneChanged -= OnZoneChanged;
             session.RewardChanged -= OnRewardChanged;
-            session.RewardsCleared -= OnRewardsCleared;
             session.StateChanged -= OnStateChanged;
+            session.RewardsCleared -= OnRewardsCleared;
         }
 
         private void ShowZone()
         {
+            winEffect.Hide();
             currentConfig = GetConfig(session.ZoneType);
             currentSlices = WheelRoller.Roll(currentConfig, random);
             wheelView.Show(currentConfig, currentSlices);
@@ -100,8 +106,24 @@ namespace VertigoDemo.Game
         private void OnSpinFinished(int winner)
         {
             RolledSlice slice = currentSlices[winner];
-            session.CompleteSpin(slice.Reward, slice.Amount, slice.Reward.IsBomb);
+            winEffect.Play(winner);
+
+            if (slice.Reward.IsBomb)
+            {
+                DOVirtual.DelayedCall(resultDelay, () => CompleteSpin(slice)).SetLink(gameObject);
+                return;
+            }
+
+            DOVirtual.DelayedCall(flyDelay, () => rewardFly.Fly(
+                    slice.Reward.Icon,
+                    wheelView.GetSliceIcon(winner),
+                    rewardHud.GetTargetPosition(slice.Reward),
+                    () => CompleteSpin(slice)))
+                .SetLink(gameObject);
         }
+
+        private void CompleteSpin(RolledSlice slice) =>
+            session.CompleteSpin(slice.Reward, slice.Amount, slice.Reward.IsBomb);
 
         private void OnZoneChanged(int zone) => ShowZone();
 
@@ -153,9 +175,11 @@ namespace VertigoDemo.Game
             resultPanel = GetComponentInChildren<ResultPanelView>(true);
             hud = GetComponentInChildren<HudView>(true);
             rewardHud = GetComponentInChildren<RewardHudView>(true);
+            winEffect = GetComponentInChildren<WheelWinEffect>(true);
+            rewardFly = GetComponentInChildren<RewardFlyEffect>(true);
 
-            if (spinButton == null || leaveButton == null || wheelView == null
-                || spinAnimator == null || resultPanel == null || hud == null || rewardHud == null)
+            if (spinButton == null || leaveButton == null || wheelView == null || spinAnimator == null
+                || resultPanel == null || hud == null || rewardHud == null || winEffect == null || rewardFly == null)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
         }
 #endif
