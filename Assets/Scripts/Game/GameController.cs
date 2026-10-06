@@ -37,6 +37,7 @@ namespace VertigoDemo.Game
         private List<RolledSlice> currentSlices;
         private GameSession<RewardData> session;
         private WheelConfig currentConfig;
+        private WheelSelector<WheelConfig> wheels;
 
         private void OnEnable()
         {
@@ -54,6 +55,7 @@ namespace VertigoDemo.Game
 
         private void Start()
         {
+            wheels = new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel);
             session = new GameSession<RewardData>();
             session.ZoneChanged += OnZoneChanged;
             session.RewardChanged += OnRewardChanged;
@@ -75,20 +77,10 @@ namespace VertigoDemo.Game
         private void ShowZone()
         {
             winEffect.Hide();
-            currentConfig = GetConfig(session.ZoneType);
+            currentConfig = wheels.For(session.ZoneType);
             currentSlices = WheelRoller.Roll(currentConfig, random);
             wheelView.Show(currentConfig, currentSlices);
             hud.ShowZone(session.Zone, session.ZoneType);
-        }
-
-        private WheelConfig GetConfig(ZoneType type)
-        {
-            switch (type)
-            {
-                case ZoneType.Safe: return safeWheel;
-                case ZoneType.Super: return superWheel;
-                default: return normalWheel;
-            }
         }
 
         private void OnSpinClicked()
