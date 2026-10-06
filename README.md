@@ -9,6 +9,15 @@ can leave and keep it all.
 - **Platform:** Android (APK in [Releases](https://github.com/gungorinci/vertigo-demo/releases))
 - **Scene:** `Assets/Scenes/Wheel.unity`
 
+## Screenshots
+
+| | 20:9 (2400×1080) | 16:9 (1920×1080) | 4:3 (1600×1200) |
+|---|---|---|---|
+| Bronze spin | ![](Screenshots/bronze_20x9.png) | ![](Screenshots/bronze_16x9.png) | ![](Screenshots/bronze_4x3.png) |
+| Silver spin (safe zone) | ![](Screenshots/silver_20x9.png) | ![](Screenshots/silver_16x9.png) | ![](Screenshots/silver_4x3.png) |
+| Rewards collected | ![](Screenshots/collected_20x9.png) | ![](Screenshots/collected_16x9.png) | ![](Screenshots/collected_4x3.png) |
+| Bomb | ![](Screenshots/bomb_20x9.png) | ![](Screenshots/bomb_16x9.png) | ![](Screenshots/bomb_4x3.png) |
+
 ## Rules
 
 | Zone | Wheel | Bomb | Can leave |
