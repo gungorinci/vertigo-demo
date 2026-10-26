@@ -32,6 +32,7 @@ namespace VertigoDemo.Game
         [SerializeField, HideInInspector] private RewardHudView rewardHud;
         [SerializeField, HideInInspector] private WheelWinEffect winEffect;
         [SerializeField, HideInInspector] private RewardFlyEffect rewardFly;
+        [SerializeField, HideInInspector] private WalletView walletView;
 
         private readonly IRandomSource random = new SystemRandomSource();
         private List<RolledSlice> currentSlices;
@@ -39,6 +40,9 @@ namespace VertigoDemo.Game
         private WheelConfig currentConfig;
         private WheelSelector<WheelConfig> wheels;
         private bool showIntro = true;
+        private IInventory<RewardData> inventory;
+        private ISaveStore saveStore;
+        private readonly List<RewardData> currencies = new List<RewardData>();
 
         private void OnEnable()
         {
@@ -62,12 +66,68 @@ namespace VertigoDemo.Game
             session.RewardChanged += OnRewardChanged;
             session.StateChanged += OnStateChanged;
             session.RewardsCleared += OnRewardsCleared;
+            LoadInventory();
             ShowZone();
             UpdateButtons();
         }
 
+        private void LoadInventory()
+        {
+            List<RewardData> catalog = CollectRewards();
+            foreach (RewardData reward in catalog)
+            {
+                if (reward.IsCurrency)
+                {
+                    currencies.Add(reward);
+                }
+            }
+
+            saveStore = new FileSaveStore();
+            inventory = new Inventory<RewardData>();
+            inventory.AddAll(InventorySave.Read(saveStore.Load(), catalog));
+            inventory.Changed += OnInventoryChanged;
+            ShowWallet();
+        }
+
+        private List<RewardData> CollectRewards()
+        {
+            var rewards = new List<RewardData>();
+            foreach (WheelConfig wheel in new[] { normalWheel, safeWheel, superWheel })
+            {
+                foreach (WheelSlice slice in wheel.Slices)
+                {
+                    foreach (RewardData reward in slice.RewardPool)
+                    {
+                        if (reward && !rewards.Contains(reward))
+                        {
+                            rewards.Add(reward);
+                        }
+                    }
+                }
+            }
+            return rewards;
+        }
+
+        private void OnInventoryChanged()
+        {
+            saveStore.Save(InventorySave.Write(inventory.Items));
+            ShowWallet();
+        }
+
+        private void ShowWallet()
+        {
+            foreach (RewardData currency in currencies)
+            {
+                walletView.Show(currency, inventory.GetAmount(currency));
+            }
+        }
+
         private void OnDestroy()
         {
+            if (inventory != null)
+            {
+                inventory.Changed -= OnInventoryChanged;
+            }
             if (session == null) return;
             session.ZoneChanged -= OnZoneChanged;
             session.RewardChanged -= OnRewardChanged;
@@ -167,7 +227,10 @@ namespace VertigoDemo.Game
 
         private void OnLeaveClicked()
         {
-            if (session.CanLeave) session.Leave();
+            if (!session.CanLeave) return;
+
+            inventory.AddAll(session.Collected);
+            session.Leave();
         }
 
         private void OnRestartClicked()
@@ -191,9 +254,11 @@ namespace VertigoDemo.Game
             rewardHud = GetComponentInChildren<RewardHudView>(true);
             winEffect = GetComponentInChildren<WheelWinEffect>(true);
             rewardFly = GetComponentInChildren<RewardFlyEffect>(true);
+            walletView = GetComponentInChildren<WalletView>(true);
 
             if (spinButton == null || leaveButton == null || wheelView == null || spinAnimator == null
-                || resultPanel == null || hud == null || rewardHud == null || winEffect == null || rewardFly == null)
+                || resultPanel == null || hud == null || rewardHud == null || winEffect == null || rewardFly == null
+                || walletView == null)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
         }
 #endif

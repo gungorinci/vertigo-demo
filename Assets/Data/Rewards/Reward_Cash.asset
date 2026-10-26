@@ -15,3 +15,4 @@ MonoBehaviour:
   displayName: Cash
   icon: {fileID: 21300000, guid: ad75657098e855d4bb4e3b6aea003b78, type: 3}
   isBomb: 0
+  _isCurrency: 1

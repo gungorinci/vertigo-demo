@@ -8,9 +8,15 @@ namespace VertigoDemo.Data
         [SerializeField] private string displayName;
         [SerializeField] private Sprite icon;
         [SerializeField] private bool isBomb;
+        [SerializeField] private bool _isCurrency;
 
         public string DisplayName => displayName;
         public Sprite Icon => icon;
         public bool IsBomb => isBomb;
+
+        public bool IsCurrency
+        {
+            get { return _isCurrency; }
+        }
     }
 }
