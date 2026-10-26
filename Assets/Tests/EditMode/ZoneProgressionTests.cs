@@ -20,9 +20,9 @@ namespace VertigoDemo.Tests
         }
 
         [TestCase(1, Bronze, true, false)]
-        [TestCase(2, Bronze, true, false)]
+        [TestCase(2, Bronze, true, true)]
         [TestCase(5, Silver, false, true)]
-        [TestCase(6, Bronze, true, false)]
+        [TestCase(6, Bronze, true, true)]
         [TestCase(30, Gold, false, true)]
         [TestCase(60, Gold, false, true)]
         [TestCase(65, Silver, false, true)]
@@ -62,12 +62,23 @@ namespace VertigoDemo.Tests
         }
 
         [Test]
-        public void Leave_IsRejectedOnNormalZone()
+        public void Leave_IsRejectedBeforeAnyReward()
+        {
+            Assert.IsFalse(session.CanLeave);
+            Assert.Throws<System.InvalidOperationException>(() => session.Leave());
+        }
+
+        [Test]
+        public void Leave_IsAllowedAfterASpinOnNormalZone()
         {
             WinUntil(3);
 
-            Assert.IsFalse(session.CanLeave);
-            Assert.Throws<System.InvalidOperationException>(() => session.Leave());
+            Assert.AreEqual(ZoneType.Normal, session.ZoneType);
+            Assert.IsTrue(session.CanLeave);
+
+            session.Leave();
+
+            Assert.AreEqual(SessionState.Left, session.State);
         }
 
         // Plays winning spins (1 cash each) until the session reaches the given zone.

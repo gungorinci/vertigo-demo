@@ -2,8 +2,8 @@
 
 A risk-and-reward wheel game made for the Vertigo Games developer demo.
 The player spins a wheel zone after zone, collecting rewards. A bomb on the
-wheel takes everything collected so far; on safe and super zones the player
-can leave and keep it all.
+wheel takes everything collected so far; after any spin the player can leave
+and keep it all.
 
 - **Unity:** 6000.3.23f1
 - **Platform:** Android (APK in [Releases](https://github.com/gungorinci/vertigo-demo/releases))
@@ -20,15 +20,15 @@ can leave and keep it all.
 
 ## Rules
 
-| Zone | Wheel | Bomb | Can leave |
-|---|---|---|---|
-| Normal | Bronze | Yes | No |
-| Every 5th (safe) | Silver | No | Yes |
-| Every 30th (super) | Gold, special rewards | No | Yes |
+| Zone | Wheel | Bomb |
+|---|---|---|
+| Normal | Bronze | Yes |
+| Every 5th (safe) | Silver | No |
+| Every 30th (super) | Gold, special rewards | No |
 
 - Hitting the bomb loses all collected rewards; the game can be restarted.
-- Leaving is only allowed while the wheel is not spinning and the zone is safe
-  or super (`ZoneRules.CanLeave`, the rule lives in one place).
+- The player can leave whenever the wheel is not spinning and at least one
+  reward has been collected (`ZoneRules.CanLeave`, the rule lives in one place).
 - Zones are endless; the wheel type is decided only by the zone number.
 
 ## Project structure

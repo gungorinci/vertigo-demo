@@ -22,7 +22,7 @@ namespace VertigoDemo.Core
 
         public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
         public bool CanSpin => State == SessionState.Idle;
-        public bool CanLeave => !IsOver && ZoneRules.CanLeave(ZoneType, State == SessionState.Spinning);
+        public bool CanLeave => !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, collected.Count > 0);
 
         public event Action<int> ZoneChanged;              // new zone
         public event Action<TReward, int> RewardChanged;   // reward, new total

@@ -28,7 +28,9 @@ namespace VertigoDemo.Core
 
         public static bool HasBomb(ZoneType type) => type == ZoneType.Normal;
 
-        public static bool CanLeave(ZoneType type, bool isSpinning) =>
-            !isSpinning && type != ZoneType.Normal;
+        public static bool CanLeave(bool isSpinning, bool hasRewards)
+        {
+            return !isSpinning && hasRewards;
+        }
     }
 }
