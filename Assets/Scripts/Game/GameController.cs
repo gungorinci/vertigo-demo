@@ -79,7 +79,7 @@ namespace VertigoDemo.Game
         {
             winEffect.Hide();
             currentConfig = wheels.For(session.ZoneType);
-            currentSlices = WheelRoller.Roll(currentConfig, random);
+            currentSlices = WheelRoller.Roll(currentConfig, session.Zone, random);
             wheelView.Show(currentConfig, currentSlices);
             if (showIntro) hud.ShowIntro(session.Zone);
             else hud.ShowZone(session.Zone, session.ZoneType);

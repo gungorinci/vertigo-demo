@@ -6,7 +6,7 @@ namespace VertigoDemo.Game
 {
     public static class WheelRoller
     {
-        public static List<RolledSlice> Roll(WheelConfig config, IRandomSource random)
+        public static List<RolledSlice> Roll(WheelConfig config, int zone, IRandomSource random)
         {
             var rolled = new List<RolledSlice>(config.Slices.Count);
 
@@ -24,7 +24,8 @@ namespace VertigoDemo.Game
                 else
                 {
                     int max = slice.MaxAmount < slice.MinAmount ? slice.MinAmount : slice.MaxAmount;
-                    amount = random.Range(slice.MinAmount, max + 1);
+                    int baseAmount = random.Range(slice.MinAmount, max + 1);
+                    amount = RewardScaling.ScaleAmount(baseAmount, zone, config.GrowthPerZone);
                 }
                 rolled.Add(new RolledSlice(reward, amount, slice.Weight));
             }
