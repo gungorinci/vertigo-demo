@@ -17,7 +17,7 @@ namespace VertigoDemo.Game
                     : null;
 
                 int amount;
-                if (reward != null && reward.IsBomb)
+                if (reward && reward.IsBomb)
                 {
                     amount = 1; // a bomb has no amount, always shown as x1
                 }
@@ -27,7 +27,8 @@ namespace VertigoDemo.Game
                     int baseAmount = random.Range(slice.MinAmount, max + 1);
                     amount = RewardScaling.ScaleAmount(baseAmount, zone, config.GrowthPerZone);
                 }
-                rolled.Add(new RolledSlice(reward, amount, slice.Weight));
+                int weight = reward ? slice.Weight : 0;
+                rolled.Add(new RolledSlice(reward, amount, weight));
             }
 
             return rolled;

@@ -90,7 +90,18 @@ namespace VertigoDemo.Game
             if (!session.CanSpin) return;
 
             var weights = new List<int>(currentSlices.Count);
-            foreach (RolledSlice slice in currentSlices) weights.Add(slice.Weight);
+            int totalWeight = 0;
+            foreach (RolledSlice slice in currentSlices)
+            {
+                weights.Add(slice.Weight);
+                totalWeight += slice.Weight;
+            }
+
+            if (totalWeight == 0)
+            {
+                Debug.LogError($"{name}: no slice can be picked on '{currentConfig.name}'.", currentConfig);
+                return;
+            }
 
             int winner = WeightedPicker.Pick(weights, random);
             session.BeginSpin();
