@@ -17,7 +17,6 @@ namespace VertigoDemo.UI
         public void Show(Sprite sprite, int amount)
         {
             _icon.sprite = sprite;
-            _icon.preserveAspect = true;
             _amountText.text = amount.ToString();
         }
 

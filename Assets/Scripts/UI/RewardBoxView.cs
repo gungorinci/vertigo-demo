@@ -16,7 +16,6 @@ namespace VertigoDemo.UI
         public void Show(Sprite sprite, int total)
         {
             icon.sprite = sprite;
-            icon.preserveAspect = true;
             amountText.text = "x" + total;
 
             transform.DOKill(true);

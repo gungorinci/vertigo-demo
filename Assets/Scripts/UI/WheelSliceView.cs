@@ -15,7 +15,6 @@ namespace VertigoDemo.UI
         public void Show(Sprite sprite, int amount)
         {
             icon.sprite = sprite;
-            icon.preserveAspect = true;
             amountText.text = "x" + amount;
         }
 
