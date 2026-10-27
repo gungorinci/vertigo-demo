@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using VertigoDemo.Core;
 using VertigoDemo.Data;
 
 namespace VertigoDemo.UI
@@ -17,8 +18,35 @@ namespace VertigoDemo.UI
         [SerializeField, Min(0f)] private float revealDuration = 0.3f;
 
         private readonly Dictionary<RewardData, RewardBoxView> boxes = new Dictionary<RewardData, RewardBoxView>();
+        private IEventBus _bus;
 
-        public void SetReward(RewardData reward, int total)
+        public void Bind(IEventBus bus)
+        {
+            _bus = bus;
+            _bus.Subscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
+            _bus.Subscribe<RewardsClearedEvent>(OnRewardsCleared);
+        }
+
+        private void OnDestroy()
+        {
+            if (_bus != null)
+            {
+                _bus.Unsubscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
+                _bus.Unsubscribe<RewardsClearedEvent>(OnRewardsCleared);
+            }
+        }
+
+        private void OnRewardChanged(RewardChangedEvent<RewardData> evt)
+        {
+            SetReward(evt.Reward, evt.Total);
+        }
+
+        private void OnRewardsCleared(RewardsClearedEvent evt)
+        {
+            Clear();
+        }
+
+        private void SetReward(RewardData reward, int total)
         {
             if (!boxes.TryGetValue(reward, out RewardBoxView box))
             {
@@ -29,7 +57,7 @@ namespace VertigoDemo.UI
             box.Show(reward.Icon, total);
         }
 
-        public void Clear()
+        private void Clear()
         {
             foreach (RewardBoxView box in boxes.Values) Destroy(box.gameObject);
             boxes.Clear();

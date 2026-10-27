@@ -32,10 +32,8 @@ namespace VertigoDemo.Game
         private WheelConfig currentConfig;
         private WheelSelector<WheelConfig> wheels;
         private bool showIntro = true;
-        private IInventory<RewardData> inventory;
-        private ISaveStore saveStore;
-        private readonly List<RewardData> currencies = new List<RewardData>();
         private SpinFlow spinFlow;
+        private EconomyPresenter economy;
 
         private void Start()
         {
@@ -43,29 +41,13 @@ namespace VertigoDemo.Game
             session = new GameSession<RewardData>(bus);
             resultPanel.Bind(bus);
             controls.Bind(bus);
+            rewardHud.Bind(bus);
             spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
                 rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
-            LoadInventory();
+            economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards());
             Subscribe();
             ShowZone();
             session.AnnounceState();
-        }
-
-        private void LoadInventory()
-        {
-            List<RewardData> catalog = CollectRewards();
-            foreach (RewardData reward in catalog)
-            {
-                if (reward.IsCurrency)
-                {
-                    currencies.Add(reward);
-                }
-            }
-
-            saveStore = new FileSaveStore();
-            inventory = new Inventory<RewardData>(bus);
-            inventory.AddAll(InventorySave.Read(saveStore.Load(), catalog));
-            ShowWallet();
         }
 
         private List<RewardData> CollectRewards()
@@ -87,26 +69,9 @@ namespace VertigoDemo.Game
             return rewards;
         }
 
-        private void OnInventoryChanged(InventoryChangedEvent evt)
-        {
-            saveStore.Save(InventorySave.Write(inventory.Items));
-            ShowWallet();
-        }
-
-        private void ShowWallet()
-        {
-            foreach (RewardData currency in currencies)
-            {
-                walletView.Show(currency, inventory.GetAmount(currency));
-            }
-        }
-
         private void Subscribe()
         {
             bus.Subscribe<ZoneChangedEvent>(OnZoneChanged);
-            bus.Subscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
-            bus.Subscribe<RewardsClearedEvent>(OnRewardsCleared);
-            bus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
             bus.Subscribe<SpinStartedEvent>(OnSpinStarted);
@@ -115,15 +80,16 @@ namespace VertigoDemo.Game
         private void OnDestroy()
         {
             bus.Unsubscribe<ZoneChangedEvent>(OnZoneChanged);
-            bus.Unsubscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
-            bus.Unsubscribe<RewardsClearedEvent>(OnRewardsCleared);
-            bus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
             bus.Unsubscribe<SpinStartedEvent>(OnSpinStarted);
             if (spinFlow != null)
             {
                 spinFlow.Dispose();
+            }
+            if (economy != null)
+            {
+                economy.Dispose();
             }
         }
 
@@ -150,15 +116,10 @@ namespace VertigoDemo.Game
 
         private void OnZoneChanged(ZoneChangedEvent evt) => ShowZone();
 
-        private void OnRewardChanged(RewardChangedEvent<RewardData> evt) => rewardHud.SetReward(evt.Reward, evt.Total);
-
-        private void OnRewardsCleared(RewardsClearedEvent evt) => rewardHud.Clear();
-
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
             if (!session.CanLeave) return;
 
-            inventory.AddAll(session.Collected);
             session.Leave();
         }
 
