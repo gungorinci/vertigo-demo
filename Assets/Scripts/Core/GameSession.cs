@@ -14,6 +14,12 @@ namespace VertigoDemo.Core
     public class GameSession<TReward>
     {
         private readonly Dictionary<TReward, int> collected = new Dictionary<TReward, int>();
+        private readonly IEventBus _bus;
+
+        public GameSession(IEventBus bus)
+        {
+            _bus = bus;
+        }
 
         public int Zone { get; private set; } = 1;
         public SessionState State { get; private set; } = SessionState.Idle;
@@ -23,11 +29,6 @@ namespace VertigoDemo.Core
         public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
         public bool CanSpin => State == SessionState.Idle;
         public bool CanLeave => !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, collected.Count > 0);
-
-        public event Action<int> ZoneChanged;              // new zone
-        public event Action<TReward, int> RewardChanged;   // reward, new total
-        public event Action RewardsCleared;
-        public event Action<SessionState> StateChanged;
 
         public void BeginSpin()
         {
@@ -49,10 +50,10 @@ namespace VertigoDemo.Core
             collected.TryGetValue(reward, out int total);
             total += amount;
             collected[reward] = total;
-            RewardChanged?.Invoke(reward, total);
+            _bus.Publish(new RewardChangedEvent<TReward>(reward, total));
 
             Zone++;
-            ZoneChanged?.Invoke(Zone);
+            PublishZone();
             SetState(SessionState.Idle);
         }
 
@@ -66,20 +67,25 @@ namespace VertigoDemo.Core
         {
             ClearRewards();
             Zone = 1;
-            ZoneChanged?.Invoke(Zone);
+            PublishZone();
             SetState(SessionState.Idle);
         }
 
         private void ClearRewards()
         {
             collected.Clear();
-            RewardsCleared?.Invoke();
+            _bus.Publish(new RewardsClearedEvent());
         }
 
         private void SetState(SessionState state)
         {
             State = state;
-            StateChanged?.Invoke(state);
+            _bus.Publish(new SessionStateChangedEvent(state));
+        }
+
+        private void PublishZone()
+        {
+            _bus.Publish(new ZoneChangedEvent(Zone, ZoneType));
         }
     }
 }

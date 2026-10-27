@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 
 namespace VertigoDemo.Core
 {
     public interface IInventory<TItem>
     {
-        event Action Changed;
-
         IReadOnlyDictionary<TItem, int> Items { get; }
 
         int GetAmount(TItem item);

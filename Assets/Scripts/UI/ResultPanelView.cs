@@ -1,8 +1,8 @@
-using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VertigoDemo.Core;
 
 namespace VertigoDemo.UI
 {
@@ -22,7 +22,12 @@ namespace VertigoDemo.UI
 
         [SerializeField, Min(0f)] private float popDuration = 0.3f;
 
-        public event Action RestartClicked;
+        private IEventBus _bus;
+
+        public void Bind(IEventBus bus)
+        {
+            _bus = bus;
+        }
 
         private void OnEnable() => restartButton.onClick.AddListener(OnRestartClicked);
 
@@ -41,7 +46,10 @@ namespace VertigoDemo.UI
 
         public void Hide() => gameObject.SetActive(false);
 
-        private void OnRestartClicked() => RestartClicked?.Invoke();
+        private void OnRestartClicked()
+        {
+            _bus.Publish(new RestartRequestedEvent());
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()

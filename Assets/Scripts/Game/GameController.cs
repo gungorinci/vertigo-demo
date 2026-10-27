@@ -35,6 +35,7 @@ namespace VertigoDemo.Game
         [SerializeField, HideInInspector] private WalletView walletView;
 
         private readonly IRandomSource random = new SystemRandomSource();
+        private readonly IEventBus bus = new EventBus();
         private List<RolledSlice> currentSlices;
         private GameSession<RewardData> session;
         private WheelConfig currentConfig;
@@ -48,25 +49,21 @@ namespace VertigoDemo.Game
         {
             spinButton.onClick.AddListener(OnSpinClicked);
             leaveButton.onClick.AddListener(OnLeaveClicked);
-            resultPanel.RestartClicked += OnRestartClicked;
         }
 
         private void OnDisable()
         {
             spinButton.onClick.RemoveListener(OnSpinClicked);
             leaveButton.onClick.RemoveListener(OnLeaveClicked);
-            resultPanel.RestartClicked -= OnRestartClicked;
         }
 
         private void Start()
         {
             wheels = new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel);
-            session = new GameSession<RewardData>();
-            session.ZoneChanged += OnZoneChanged;
-            session.RewardChanged += OnRewardChanged;
-            session.StateChanged += OnStateChanged;
-            session.RewardsCleared += OnRewardsCleared;
+            session = new GameSession<RewardData>(bus);
+            resultPanel.Bind(bus);
             LoadInventory();
+            Subscribe();
             ShowZone();
             UpdateButtons();
         }
@@ -83,9 +80,8 @@ namespace VertigoDemo.Game
             }
 
             saveStore = new FileSaveStore();
-            inventory = new Inventory<RewardData>();
+            inventory = new Inventory<RewardData>(bus);
             inventory.AddAll(InventorySave.Read(saveStore.Load(), catalog));
-            inventory.Changed += OnInventoryChanged;
             ShowWallet();
         }
 
@@ -108,7 +104,7 @@ namespace VertigoDemo.Game
             return rewards;
         }
 
-        private void OnInventoryChanged()
+        private void OnInventoryChanged(InventoryChangedEvent evt)
         {
             saveStore.Save(InventorySave.Write(inventory.Items));
             ShowWallet();
@@ -122,17 +118,24 @@ namespace VertigoDemo.Game
             }
         }
 
+        private void Subscribe()
+        {
+            bus.Subscribe<ZoneChangedEvent>(OnZoneChanged);
+            bus.Subscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
+            bus.Subscribe<RewardsClearedEvent>(OnRewardsCleared);
+            bus.Subscribe<SessionStateChangedEvent>(OnStateChanged);
+            bus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
+            bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
+        }
+
         private void OnDestroy()
         {
-            if (inventory != null)
-            {
-                inventory.Changed -= OnInventoryChanged;
-            }
-            if (session == null) return;
-            session.ZoneChanged -= OnZoneChanged;
-            session.RewardChanged -= OnRewardChanged;
-            session.StateChanged -= OnStateChanged;
-            session.RewardsCleared -= OnRewardsCleared;
+            bus.Unsubscribe<ZoneChangedEvent>(OnZoneChanged);
+            bus.Unsubscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
+            bus.Unsubscribe<RewardsClearedEvent>(OnRewardsCleared);
+            bus.Unsubscribe<SessionStateChangedEvent>(OnStateChanged);
+            bus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
+            bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
         }
 
         private void ShowZone()
@@ -196,17 +199,17 @@ namespace VertigoDemo.Game
         private void CompleteSpin(RolledSlice slice) =>
             session.CompleteSpin(slice.Reward, slice.Amount, slice.Reward.IsBomb);
 
-        private void OnZoneChanged(int zone) => ShowZone();
+        private void OnZoneChanged(ZoneChangedEvent evt) => ShowZone();
 
-        private void OnRewardChanged(RewardData reward, int total) => rewardHud.SetReward(reward, total);
+        private void OnRewardChanged(RewardChangedEvent<RewardData> evt) => rewardHud.SetReward(evt.Reward, evt.Total);
 
-        private void OnRewardsCleared() => rewardHud.Clear();
+        private void OnRewardsCleared(RewardsClearedEvent evt) => rewardHud.Clear();
 
-        private void OnStateChanged(SessionState state)
+        private void OnStateChanged(SessionStateChangedEvent evt)
         {
             UpdateButtons();
 
-            switch (state)
+            switch (evt.State)
             {
                 case SessionState.Lost:
                     resultPanel.Show(loseIcon, "BOMB! ALL REWARDS LOST", "RESTART");
@@ -234,7 +237,7 @@ namespace VertigoDemo.Game
             session.Leave();
         }
 
-        private void OnRestartClicked()
+        private void OnRestartRequested(RestartRequestedEvent evt)
         {
             showIntro = true;
             session.Restart();

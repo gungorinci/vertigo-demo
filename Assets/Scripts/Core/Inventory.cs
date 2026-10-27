@@ -6,8 +6,12 @@ namespace VertigoDemo.Core
     public class Inventory<TItem> : IInventory<TItem>
     {
         private readonly Dictionary<TItem, int> _items = new Dictionary<TItem, int>();
+        private readonly IEventBus _bus;
 
-        public event Action Changed;
+        public Inventory(IEventBus bus)
+        {
+            _bus = bus;
+        }
 
         public IReadOnlyDictionary<TItem, int> Items
         {
@@ -53,10 +57,7 @@ namespace VertigoDemo.Core
 
         private void NotifyChanged()
         {
-            if (Changed != null)
-            {
-                Changed();
-            }
+            _bus.Publish(new InventoryChangedEvent());
         }
 
         #endregion

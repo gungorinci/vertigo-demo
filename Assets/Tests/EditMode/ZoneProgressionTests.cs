@@ -16,7 +16,7 @@ namespace VertigoDemo.Tests
         public void SetUp()
         {
             wheels = new WheelSelector<string>(Bronze, Silver, Gold);
-            session = new GameSession<string>();
+            session = new GameSession<string>(new EventBus());
         }
 
         [TestCase(1, Bronze, true, false)]

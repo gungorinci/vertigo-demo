@@ -9,7 +9,7 @@ namespace VertigoDemo.Tests
         [Test]
         public void AddingTheSameItem_AddsUpItsAmount()
         {
-            var inventory = new Inventory<string>();
+            var inventory = new Inventory<string>(new EventBus());
 
             inventory.Add("cash", 10);
             inventory.Add("cash", 5);
@@ -20,10 +20,11 @@ namespace VertigoDemo.Tests
         [Test]
         public void LeavingTransfersTheCollectedRewards()
         {
-            var session = new GameSession<string>();
-            var inventory = new Inventory<string>();
+            var bus = new EventBus();
+            var session = new GameSession<string>(bus);
+            var inventory = new Inventory<string>(bus);
             int changes = 0;
-            inventory.Changed += () => changes++;
+            bus.Subscribe<InventoryChangedEvent>(evt => changes++);
 
             session.BeginSpin();
             session.CompleteSpin("cash", 7, isBomb: false);
