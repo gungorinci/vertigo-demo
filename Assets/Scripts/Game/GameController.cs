@@ -12,9 +12,6 @@ namespace VertigoDemo.Game
         [SerializeField] private WheelConfig safeWheel;     // silver, every 5th zone
         [SerializeField] private WheelConfig superWheel;    // gold, every 30th zone
 
-        [Header("Result panel")]
-        [SerializeField] private Sprite loseIcon;
-        [SerializeField] private Sprite winIcon;
         [SerializeField, Min(0f)] private float resultDelay = 1f;
         [SerializeField, Min(0f)] private float flyDelay = 0.4f;
 
@@ -109,7 +106,6 @@ namespace VertigoDemo.Game
             bus.Subscribe<ZoneChangedEvent>(OnZoneChanged);
             bus.Subscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
             bus.Subscribe<RewardsClearedEvent>(OnRewardsCleared);
-            bus.Subscribe<SessionStateChangedEvent>(OnStateChanged);
             bus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
@@ -121,7 +117,6 @@ namespace VertigoDemo.Game
             bus.Unsubscribe<ZoneChangedEvent>(OnZoneChanged);
             bus.Unsubscribe<RewardChangedEvent<RewardData>>(OnRewardChanged);
             bus.Unsubscribe<RewardsClearedEvent>(OnRewardsCleared);
-            bus.Unsubscribe<SessionStateChangedEvent>(OnStateChanged);
             bus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
@@ -158,22 +153,6 @@ namespace VertigoDemo.Game
         private void OnRewardChanged(RewardChangedEvent<RewardData> evt) => rewardHud.SetReward(evt.Reward, evt.Total);
 
         private void OnRewardsCleared(RewardsClearedEvent evt) => rewardHud.Clear();
-
-        private void OnStateChanged(SessionStateChangedEvent evt)
-        {
-            switch (evt.State)
-            {
-                case SessionState.Lost:
-                    resultPanel.Show(loseIcon, "BOMB! ALL REWARDS LOST", "RESTART");
-                    break;
-                case SessionState.Left:
-                    resultPanel.Show(winIcon, "REWARDS COLLECTED!", "PLAY AGAIN");
-                    break;
-                case SessionState.Idle:
-                    resultPanel.Hide();
-                    break;
-            }
-        }
 
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {

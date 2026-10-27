@@ -521,6 +521,8 @@ MonoBehaviour:
   title: {fileID: 1788997541}
   restartButton: {fileID: 1106084593}
   restartText: {fileID: 1136889782}
+  _loseIcon: {fileID: 21300000, guid: 0e3f669c4aed11a4ab93bc84609184e4, type: 3}
+  _winIcon: {fileID: 21300000, guid: 332d37d75de1a8a42bbf68db75b947a6, type: 3}
   popDuration: 0.3
 --- !u!1 &200211083
 GameObject:
@@ -1580,8 +1582,6 @@ MonoBehaviour:
   normalWheel: {fileID: 11400000, guid: 9e8f0e802b8f3b3489abd1eb25e72707, type: 2}
   safeWheel: {fileID: 11400000, guid: 27344816dae852d478046259ca6465fa, type: 2}
   superWheel: {fileID: 11400000, guid: 2bccbddfd09eee34db4dde801b196d39, type: 2}
-  loseIcon: {fileID: 21300000, guid: 0e3f669c4aed11a4ab93bc84609184e4, type: 3}
-  winIcon: {fileID: 21300000, guid: 332d37d75de1a8a42bbf68db75b947a6, type: 3}
   resultDelay: 1
   flyDelay: 0.4
   spinButton: {fileID: 2144863794}
