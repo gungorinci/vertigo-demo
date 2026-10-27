@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using DG.Tweening;
 using UnityEngine;
-using UnityEngine.UI;
 using VertigoDemo.Core;
 using VertigoDemo.Data;
 using VertigoDemo.UI;
@@ -10,9 +8,6 @@ namespace VertigoDemo.Game
 {
     public class GameController : MonoBehaviour
     {
-        private const string SpinButtonName = "ui_button_spin_wheel";
-        private const string LeaveButtonName = "ui_button_leave";
-
         [SerializeField] private WheelConfig normalWheel;   // bronze, with the bomb
         [SerializeField] private WheelConfig safeWheel;     // silver, every 5th zone
         [SerializeField] private WheelConfig superWheel;    // gold, every 30th zone
@@ -23,8 +18,7 @@ namespace VertigoDemo.Game
         [SerializeField, Min(0f)] private float resultDelay = 1f;
         [SerializeField, Min(0f)] private float flyDelay = 0.4f;
 
-        [SerializeField, HideInInspector] private Button spinButton;
-        [SerializeField, HideInInspector] private Button leaveButton;
+        [SerializeField, HideInInspector] private ControlsView controls;
         [SerializeField, HideInInspector] private WheelView wheelView;
         [SerializeField, HideInInspector] private WheelSpinAnimator spinAnimator;
         [SerializeField, HideInInspector] private ResultPanelView resultPanel;
@@ -44,28 +38,20 @@ namespace VertigoDemo.Game
         private IInventory<RewardData> inventory;
         private ISaveStore saveStore;
         private readonly List<RewardData> currencies = new List<RewardData>();
-
-        private void OnEnable()
-        {
-            spinButton.onClick.AddListener(OnSpinClicked);
-            leaveButton.onClick.AddListener(OnLeaveClicked);
-        }
-
-        private void OnDisable()
-        {
-            spinButton.onClick.RemoveListener(OnSpinClicked);
-            leaveButton.onClick.RemoveListener(OnLeaveClicked);
-        }
+        private SpinFlow spinFlow;
 
         private void Start()
         {
             wheels = new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel);
             session = new GameSession<RewardData>(bus);
             resultPanel.Bind(bus);
+            controls.Bind(bus);
+            spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
+                rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
             LoadInventory();
             Subscribe();
             ShowZone();
-            UpdateButtons();
+            session.AnnounceState();
         }
 
         private void LoadInventory()
@@ -126,6 +112,8 @@ namespace VertigoDemo.Game
             bus.Subscribe<SessionStateChangedEvent>(OnStateChanged);
             bus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
+            bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
+            bus.Subscribe<SpinStartedEvent>(OnSpinStarted);
         }
 
         private void OnDestroy()
@@ -136,6 +124,12 @@ namespace VertigoDemo.Game
             bus.Unsubscribe<SessionStateChangedEvent>(OnStateChanged);
             bus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
             bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
+            bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
+            bus.Unsubscribe<SpinStartedEvent>(OnSpinStarted);
+            if (spinFlow != null)
+            {
+                spinFlow.Dispose();
+            }
         }
 
         private void ShowZone()
@@ -144,60 +138,20 @@ namespace VertigoDemo.Game
             currentConfig = wheels.For(session.ZoneType);
             currentSlices = WheelRoller.Roll(currentConfig, session.Zone, random);
             wheelView.Show(currentConfig, currentSlices);
+            spinFlow.SetSlices(currentSlices, currentConfig.name);
             if (showIntro) hud.ShowIntro(session.Zone);
             else hud.ShowZone(session.Zone, session.ZoneType);
         }
 
-        private void OnSpinClicked()
+        private void OnSpinStarted(SpinStartedEvent evt)
         {
-            if (!session.CanSpin) return;
-
-            var weights = new List<int>(currentSlices.Count);
-            int totalWeight = 0;
-            foreach (RolledSlice slice in currentSlices)
+            if (!showIntro)
             {
-                weights.Add(slice.Weight);
-                totalWeight += slice.Weight;
-            }
-
-            if (totalWeight == 0)
-            {
-                Debug.LogError($"{name}: no slice can be picked on '{currentConfig.name}'.", currentConfig);
                 return;
             }
-
-            int winner = WeightedPicker.Pick(weights, random);
-            session.BeginSpin();
-            if (showIntro)
-            {
-                showIntro = false;
-                hud.ShowZone(session.Zone, session.ZoneType);
-            }
-            spinAnimator.Spin(winner, currentSlices.Count, random, () => OnSpinFinished(winner));
+            showIntro = false;
+            hud.ShowZone(session.Zone, session.ZoneType);
         }
-
-        private void OnSpinFinished(int winner)
-        {
-            RolledSlice slice = currentSlices[winner];
-            winEffect.Play(winner);
-
-            if (slice.Reward.IsBomb)
-            {
-                DOVirtual.DelayedCall(resultDelay, () => CompleteSpin(slice)).SetLink(gameObject);
-                return;
-            }
-
-            rewardHud.Reveal(slice.Reward);
-            DOVirtual.DelayedCall(flyDelay, () => rewardFly.Fly(
-                    slice.Reward.Icon,
-                    wheelView.GetSliceIcon(winner),
-                    rewardHud.GetTargetPosition(slice.Reward),
-                    () => CompleteSpin(slice)))
-                .SetLink(gameObject);
-        }
-
-        private void CompleteSpin(RolledSlice slice) =>
-            session.CompleteSpin(slice.Reward, slice.Amount, slice.Reward.IsBomb);
 
         private void OnZoneChanged(ZoneChangedEvent evt) => ShowZone();
 
@@ -207,8 +161,6 @@ namespace VertigoDemo.Game
 
         private void OnStateChanged(SessionStateChangedEvent evt)
         {
-            UpdateButtons();
-
             switch (evt.State)
             {
                 case SessionState.Lost:
@@ -223,13 +175,7 @@ namespace VertigoDemo.Game
             }
         }
 
-        private void UpdateButtons()
-        {
-            spinButton.interactable = session.CanSpin;
-            leaveButton.interactable = session.CanLeave;
-        }
-
-        private void OnLeaveClicked()
+        private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
             if (!session.CanLeave) return;
 
@@ -246,13 +192,10 @@ namespace VertigoDemo.Game
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            Transform button = transform.FindDeep(SpinButtonName);
-            spinButton = button != null ? button.GetComponent<Button>() : null;
+            controls = GetComponentInChildren<ControlsView>(true);
             wheelView = GetComponentInChildren<WheelView>(true);
             spinAnimator = GetComponentInChildren<WheelSpinAnimator>(true);
 
-            Transform leave = transform.FindDeep(LeaveButtonName);
-            leaveButton = leave != null ? leave.GetComponent<Button>() : null;
             resultPanel = GetComponentInChildren<ResultPanelView>(true);
             hud = GetComponentInChildren<HudView>(true);
             rewardHud = GetComponentInChildren<RewardHudView>(true);
@@ -260,7 +203,7 @@ namespace VertigoDemo.Game
             rewardFly = GetComponentInChildren<RewardFlyEffect>(true);
             walletView = GetComponentInChildren<WalletView>(true);
 
-            if (spinButton == null || leaveButton == null || wheelView == null || spinAnimator == null
+            if (controls == null || wheelView == null || spinAnimator == null
                 || resultPanel == null || hud == null || rewardHud == null || winEffect == null || rewardFly == null
                 || walletView == null)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);

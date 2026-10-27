@@ -15,10 +15,14 @@ namespace VertigoDemo.Core
     public readonly struct SessionStateChangedEvent
     {
         public readonly SessionState State;
+        public readonly bool CanSpin;
+        public readonly bool CanLeave;
 
-        public SessionStateChangedEvent(SessionState state)
+        public SessionStateChangedEvent(SessionState state, bool canSpin, bool canLeave)
         {
             State = state;
+            CanSpin = canSpin;
+            CanLeave = canLeave;
         }
     }
 
@@ -43,6 +47,18 @@ namespace VertigoDemo.Core
     }
 
     public readonly struct RestartRequestedEvent
+    {
+    }
+
+    public readonly struct SpinRequestedEvent
+    {
+    }
+
+    public readonly struct SpinStartedEvent
+    {
+    }
+
+    public readonly struct LeaveRequestedEvent
     {
     }
 }

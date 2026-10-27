@@ -80,7 +80,12 @@ namespace VertigoDemo.Core
         private void SetState(SessionState state)
         {
             State = state;
-            _bus.Publish(new SessionStateChangedEvent(state));
+            AnnounceState();
+        }
+
+        public void AnnounceState()
+        {
+            _bus.Publish(new SessionStateChangedEvent(State, CanSpin, CanLeave));
         }
 
         private void PublishZone()
