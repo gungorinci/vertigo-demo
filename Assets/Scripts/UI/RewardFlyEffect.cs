@@ -8,21 +8,23 @@ namespace VertigoDemo.UI
     public class RewardFlyEffect : MonoBehaviour
     {
         private const string FlyImageName = "ui_image_reward_fly_value";
+        private const string FlyAnimatorName = "ui_animator_reward_fly";
 
         [SerializeField, HideInInspector] private Image flyImage;
+        [SerializeField, HideInInspector] private RectTransform flyAnimator;
         [SerializeField, Min(0.1f)] private float duration = 0.6f;
         [SerializeField] private float arcHeight = 200f;
 
         public void Fly(Sprite sprite, RectTransform from, Vector3 to, Action onArrived)
         {
-            RectTransform rt = flyImage.rectTransform;
+            RectTransform rt = flyAnimator;
             rt.DOKill();
 
             flyImage.sprite = sprite;
             rt.position = from.position;
             rt.sizeDelta = from.rect.size;
             rt.localScale = Vector3.one;
-            flyImage.gameObject.SetActive(true);
+            rt.gameObject.SetActive(true);
 
             Vector3 middle = (rt.position + to) * 0.5f + rt.parent.TransformVector(Vector3.up * arcHeight);
 
@@ -31,7 +33,7 @@ namespace VertigoDemo.UI
                 .Join(rt.DOScale(0.6f, duration))
                 .OnComplete(() =>
                 {
-                    flyImage.gameObject.SetActive(false);
+                    rt.gameObject.SetActive(false);
                     onArrived?.Invoke();
                 })
                 .SetLink(gameObject);
@@ -41,6 +43,7 @@ namespace VertigoDemo.UI
         private void OnValidate()
         {
             flyImage = transform.FindDeepComponent<Image>(FlyImageName);
+            flyAnimator = transform.FindDeepComponent<RectTransform>(FlyAnimatorName);
         }
 #endif
     }
