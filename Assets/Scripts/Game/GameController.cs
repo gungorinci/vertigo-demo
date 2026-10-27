@@ -184,6 +184,7 @@ namespace VertigoDemo.Game
                 return;
             }
 
+            rewardHud.Reveal(slice.Reward);
             DOVirtual.DelayedCall(flyDelay, () => rewardFly.Fly(
                     slice.Reward.Icon,
                     wheelView.GetSliceIcon(winner),
