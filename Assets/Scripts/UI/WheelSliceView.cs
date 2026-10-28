@@ -23,10 +23,10 @@ namespace VertigoDemo.UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            icon = transform.FindDeep(IconName)?.GetComponent<Image>();
-            amountText = transform.FindDeep(AmountTextName)?.GetComponent<TMP_Text>();
+            icon = transform.FindDeepComponent<Image>(IconName);
+            amountText = transform.FindDeepComponent<TMP_Text>(AmountTextName);
 
-            if (icon == null || amountText == null)
+            if (!icon || !amountText)
                 Debug.LogWarning($"{name}: slice children not found.", this);
         }
 #endif

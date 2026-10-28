@@ -95,7 +95,7 @@ namespace VertigoDemo.UI
         private T FindComponent<T>(string childName) where T : Component
         {
             Transform child = transform.FindDeep(childName);
-            if (child == null)
+            if (!child)
             {
                 Debug.LogWarning($"{name}: child '{childName}' not found.", this);
                 return null;

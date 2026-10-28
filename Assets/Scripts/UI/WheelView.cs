@@ -22,7 +22,7 @@ namespace VertigoDemo.UI
             for (int i = 0; i < sliceViews.Length && i < slices.Count; i++)
             {
                 RolledSlice slice = slices[i];
-                if (slice.Reward == null) continue;
+                if (!slice.Reward) continue;
                 sliceViews[i].Show(slice.Reward.Icon, slice.Amount);
             }
         }
@@ -40,7 +40,7 @@ namespace VertigoDemo.UI
         private Image FindImage(string childName)
         {
             Transform child = transform.FindDeep(childName);
-            if (child == null)
+            if (!child)
             {
                 Debug.LogWarning($"{name}: child '{childName}' not found.", this);
                 return null;

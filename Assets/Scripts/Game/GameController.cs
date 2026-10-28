@@ -33,6 +33,7 @@ namespace VertigoDemo.Game
 
         private void Start()
         {
+            List<ZoneTypeData> zoneTypes = CollectZoneTypes();
             random = _randomSettings.CreateSource();
             session = new GameSession<RewardData>(bus);
             resultPanel.Bind(bus);
@@ -40,18 +41,32 @@ namespace VertigoDemo.Game
             rewardHud.Bind(bus);
             spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
                 rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
-            economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards());
-            zones = new ZonePresenter(bus, session, new ZoneSchedule<ZoneTypeData>(_zoneTypes),
+            economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards(zoneTypes));
+            zones = new ZonePresenter(bus, session, new ZoneSchedule<ZoneTypeData>(zoneTypes),
                 random, spinFlow, wheelView, winEffect, hud);
             Subscribe();
             zones.ShowZone();
             session.AnnounceState();
         }
 
-        private List<RewardData> CollectRewards()
+        // ZoneSchedule lives in Core and cannot see Unity's fake null, so empty or missing slots are dropped here.
+        private List<ZoneTypeData> CollectZoneTypes()
+        {
+            var zoneTypes = new List<ZoneTypeData>();
+            foreach (ZoneTypeData zoneType in _zoneTypes)
+            {
+                if (zoneType)
+                {
+                    zoneTypes.Add(zoneType);
+                }
+            }
+            return zoneTypes;
+        }
+
+        private List<RewardData> CollectRewards(List<ZoneTypeData> zoneTypes)
         {
             var rewards = new List<RewardData>();
-            foreach (ZoneTypeData zoneType in _zoneTypes)
+            foreach (ZoneTypeData zoneType in zoneTypes)
             {
                 foreach (WheelSlice slice in zoneType.Wheel.Slices)
                 {
@@ -117,9 +132,9 @@ namespace VertigoDemo.Game
             rewardFly = GetComponentInChildren<RewardFlyEffect>(true);
             walletView = GetComponentInChildren<WalletView>(true);
 
-            if (controls == null || wheelView == null || spinAnimator == null
-                || resultPanel == null || hud == null || rewardHud == null || winEffect == null || rewardFly == null
-                || walletView == null)
+            if (!controls || !wheelView || !spinAnimator
+                || !resultPanel || !hud || !rewardHud || !winEffect || !rewardFly
+                || !walletView)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
         }
 #endif

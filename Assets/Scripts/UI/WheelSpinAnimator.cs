@@ -93,7 +93,7 @@ namespace VertigoDemo.UI
             if (slice == lastSliceUnderPointer) return;
             lastSliceUnderPointer = slice;
 
-            if (tickClip == null || Time.time - lastTickTime < minTickInterval) return;
+            if (!tickClip || Time.time - lastTickTime < minTickInterval) return;
             lastTickTime = Time.time;
             audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
             audioSource.PlayOneShot(tickClip);
@@ -110,7 +110,7 @@ namespace VertigoDemo.UI
             pointer = transform.FindDeep(PointerName) as RectTransform;
             audioSource = GetComponent<AudioSource>();
 
-            if (wheelTransform == null || pointer == null)
+            if (!wheelTransform || !pointer)
                 Debug.LogWarning($"{name}: wheel or pointer not found.", this);
         }
 #endif

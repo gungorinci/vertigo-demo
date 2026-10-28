@@ -94,7 +94,7 @@ namespace VertigoDemo.UI
 
             // A new box is appended at the right end of the container.
             var layout = container.GetComponent<HorizontalLayoutGroup>();
-            float spacing = layout != null && boxes.Count > 0 ? layout.spacing : 0f;
+            float spacing = layout && boxes.Count > 0 ? layout.spacing : 0f;
             float halfBox = ((RectTransform)boxPrefab.transform).rect.width * 0.5f;
             float rightPadding = layout ? layout.padding.right : 0f;
             float lastBoxRight = container.rect.xMax - rightPadding;
