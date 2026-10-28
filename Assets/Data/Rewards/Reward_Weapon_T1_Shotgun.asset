@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c59022a700ea845961d9f15a8ac662, type: 3}
   m_Name: Reward_Weapon_T1_Shotgun
   m_EditorClassIdentifier: 
-  displayName: Shotgun T1
-  icon: {fileID: 21300000, guid: 38682786de8aedf4e849756c85d5490e, type: 3}
-  isBomb: 0
+  _displayName: Shotgun T1
+  _icon: {fileID: 21300000, guid: 38682786de8aedf4e849756c85d5490e, type: 3}
+  _isBomb: 0
+  _isCurrency: 0

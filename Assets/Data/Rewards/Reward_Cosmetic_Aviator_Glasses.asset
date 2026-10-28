@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c59022a700ea845961d9f15a8ac662, type: 3}
   m_Name: Reward_Cosmetic_Aviator_Glasses
   m_EditorClassIdentifier: 
-  displayName: Aviator Glasses
-  icon: {fileID: 21300000, guid: db3e431ae9d32f343b4f62976fa6c934, type: 3}
-  isBomb: 0
+  _displayName: Aviator Glasses
+  _icon: {fileID: 21300000, guid: db3e431ae9d32f343b4f62976fa6c934, type: 3}
+  _isBomb: 0
+  _isCurrency: 0
