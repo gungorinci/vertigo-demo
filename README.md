@@ -65,6 +65,8 @@ Three layers, so the rules can be tested without Unity:
    - `RewardData`: one reward type (name, icon, is bomb).
    - `ZoneTypeData`: a zone type's interval, bomb rule, wheel and HUD texts.
      A new zone type is a new asset in the GameController's list, no code change.
+   - `RandomSettings`: creates the game's random source. A seed other than 0
+     replays the same spins, which helps when reproducing a bug.
    - `WheelConfig`: a wheel's sprites and its 8 slices. Each `WheelSlice` has
      a reward pool, an amount range and a weight. `RolledSlice` is one slice
      after its reward and amount are rolled.

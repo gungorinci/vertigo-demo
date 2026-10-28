@@ -1583,6 +1583,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 256114db7e9d434194a05e94531f3647, type: 2}
   - {fileID: 11400000, guid: 2055432f53a3457dbd21bca3ccc8aea9, type: 2}
   - {fileID: 11400000, guid: e043aec3024042b0949940f737da4218, type: 2}
+  _randomSettings: {fileID: 11400000, guid: 4e7a8557716044ea81303cd8b2f0aaa0, type: 2}
   resultDelay: 1
   flyDelay: 0.4
   spinButton: {fileID: 2144863794}

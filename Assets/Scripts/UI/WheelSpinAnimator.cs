@@ -10,6 +10,8 @@ namespace VertigoDemo.UI
     {
         private const string WheelTransformName = "ui_animator_wheel";
         private const string PointerName = "ui_image_pointer_value";
+        private const float PITCH_VARIATION = 0.05f;
+        private const int PITCH_STEPS = 1000;
 
         [SerializeField, HideInInspector] private RectTransform wheelTransform;
         [SerializeField, HideInInspector] private RectTransform pointer;
@@ -29,12 +31,14 @@ namespace VertigoDemo.UI
         private float lastTickTime;
 
         private Tween spinTween;
+        private IRandomSource _random;
 
         public bool IsSpinning => spinTween != null && spinTween.IsActive();
 
         public void Spin(int targetIndex, int sliceCount, IRandomSource random, Action onComplete)
         {
             if (IsSpinning) return;
+            _random = random;
 
             float sliceAngle = 360f / sliceCount;
             float offset = (random.Range(-1000, 1001) / 1000f) * maxOffsetInSlice * sliceAngle;
@@ -81,7 +85,7 @@ namespace VertigoDemo.UI
 
             if (tickClip == null || Time.time - lastTickTime < minTickInterval) return;
             lastTickTime = Time.time;
-            audioSource.pitch = UnityEngine.Random.Range(0.95f, 1.05f);
+            audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
             audioSource.PlayOneShot(tickClip);
         }
 

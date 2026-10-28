@@ -9,6 +9,7 @@ namespace VertigoDemo.Game
     public class GameController : MonoBehaviour
     {
         [SerializeField] private List<ZoneTypeData> _zoneTypes = new List<ZoneTypeData>();
+        [SerializeField] private RandomSettings _randomSettings;
 
         [SerializeField, Min(0f)] private float resultDelay = 1f;
         [SerializeField, Min(0f)] private float flyDelay = 0.4f;
@@ -23,7 +24,7 @@ namespace VertigoDemo.Game
         [SerializeField, HideInInspector] private RewardFlyEffect rewardFly;
         [SerializeField, HideInInspector] private WalletView walletView;
 
-        private readonly IRandomSource random = new SystemRandomSource();
+        private IRandomSource random;
         private readonly IEventBus bus = new EventBus();
         private GameSession<RewardData> session;
         private SpinFlow spinFlow;
@@ -32,6 +33,7 @@ namespace VertigoDemo.Game
 
         private void Start()
         {
+            random = _randomSettings.CreateSource();
             session = new GameSession<RewardData>(bus);
             resultPanel.Bind(bus);
             controls.Bind(bus);
