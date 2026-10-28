@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace VertigoDemo.Data
 {
@@ -8,14 +9,14 @@ namespace VertigoDemo.Data
     {
         private const int SLOT_COUNT = 8;
 
-        [SerializeField] private Sprite wheelSprite;
-        [SerializeField] private Sprite indicatorSprite;
-        [SerializeField] private List<WheelSlice> slices = new List<WheelSlice>();
+        [SerializeField, FormerlySerializedAs("wheelSprite")] private Sprite _wheelSprite;
+        [SerializeField, FormerlySerializedAs("indicatorSprite")] private Sprite _indicatorSprite;
+        [SerializeField, FormerlySerializedAs("slices")] private List<WheelSlice> _slices = new List<WheelSlice>();
         [SerializeField, Range(0f, 0.5f)] private float _growthPerZone = 0.08f;
 
-        public Sprite WheelSprite => wheelSprite;
-        public Sprite IndicatorSprite => indicatorSprite;
-        public IReadOnlyList<WheelSlice> Slices => slices;
+        public Sprite WheelSprite => _wheelSprite;
+        public Sprite IndicatorSprite => _indicatorSprite;
+        public IReadOnlyList<WheelSlice> Slices => _slices;
 
         public float GrowthPerZone
         {
@@ -25,7 +26,7 @@ namespace VertigoDemo.Data
         public int CountBombSlices()
         {
             int bombSlices = 0;
-            foreach (WheelSlice slice in slices)
+            foreach (WheelSlice slice in _slices)
             {
                 foreach (RewardData reward in slice.RewardPool)
                 {
@@ -44,14 +45,14 @@ namespace VertigoDemo.Data
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (slices.Count != SLOT_COUNT)
+            if (_slices.Count != SLOT_COUNT)
             {
-                LogProblem($"has {slices.Count} slices, the wheel has {SLOT_COUNT} slots.");
+                LogProblem($"has {_slices.Count} slices, the wheel has {SLOT_COUNT} slots.");
             }
 
-            for (int i = 0; i < slices.Count; i++)
+            for (int i = 0; i < _slices.Count; i++)
             {
-                WheelSlice slice = slices[i];
+                WheelSlice slice = _slices[i];
                 int rewards = 0;
                 int bombs = 0;
 

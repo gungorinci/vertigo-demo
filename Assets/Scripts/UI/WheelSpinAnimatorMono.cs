@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VertigoDemo.Core;
 
 namespace VertigoDemo.UI
@@ -8,36 +9,36 @@ namespace VertigoDemo.UI
     [RequireComponent(typeof(AudioSource))]
     public class WheelSpinAnimatorMono : MonoBehaviour
     {
-        private const string WheelTransformName = "ui_animator_wheel";
-        private const string PointerName = "ui_image_pointer_value";
+        private const string WHEEL_TRANSFORM_NAME = "ui_animator_wheel";
+        private const string POINTER_NAME = "ui_image_pointer_value";
         private const float PITCH_VARIATION = 0.05f;
         private const int PITCH_STEPS = 1000;
 
-        [SerializeField, HideInInspector] private RectTransform wheelTransform;
-        [SerializeField, HideInInspector] private RectTransform pointer;
+        [SerializeField, HideInInspector, FormerlySerializedAs("wheelTransform")] private RectTransform _wheelTransform;
+        [SerializeField, HideInInspector, FormerlySerializedAs("pointer")] private RectTransform _pointer;
 
-        [SerializeField, Min(1)] private int fullTurns = 10;
-        [SerializeField, Min(0.5f)] private float duration = 7f;
-        [SerializeField] private Ease ease = Ease.OutQuart;
-        [SerializeField, Range(0f, 0.45f)] private float maxOffsetInSlice = 0.3f;
-        [SerializeField] private AudioClip tickClip;
-        [SerializeField, Min(0f)] private float minTickInterval = 0.03f;
+        [SerializeField, Min(1), FormerlySerializedAs("fullTurns")] private int _fullTurns = 10;
+        [SerializeField, Min(0.5f), FormerlySerializedAs("duration")] private float _duration = 7f;
+        [SerializeField, FormerlySerializedAs("ease")] private Ease _ease = Ease.OutQuart;
+        [SerializeField, Range(0f, 0.45f), FormerlySerializedAs("maxOffsetInSlice")] private float _maxOffsetInSlice = 0.3f;
+        [SerializeField, FormerlySerializedAs("tickClip")] private AudioClip _tickClip;
+        [SerializeField, Min(0f), FormerlySerializedAs("minTickInterval")] private float _minTickInterval = 0.03f;
 
-        [SerializeField, HideInInspector] private AudioSource audioSource;
+        [SerializeField, HideInInspector, FormerlySerializedAs("audioSource")] private AudioSource _audioSource;
 
-        private float unwrappedAngle;
-        private float lastEulerZ;
-        private int lastSliceUnderPointer;
-        private float lastTickTime;
+        private float _unwrappedAngle;
+        private float _lastEulerZ;
+        private int _lastSliceUnderPointer;
+        private float _lastTickTime;
 
-        private Tween spinTween;
+        private Tween _spinTween;
         private IRandomSource _random;
         private float _pointerAngle;
         private float _sliceAngle;
         private float _targetAngle;
         private Action _onComplete;
 
-        public bool IsSpinning => spinTween != null && spinTween.IsActive();
+        public bool IsSpinning => _spinTween != null && _spinTween.IsActive();
 
         public void Spin(int targetIndex, int sliceCount, IRandomSource random, Action onComplete)
         {
@@ -50,20 +51,20 @@ namespace VertigoDemo.UI
             _onComplete = onComplete;
             _sliceAngle = 360f / sliceCount;
             _pointerAngle = PointerAngle();
-            float offset = (random.Range(-1000, 1001) / 1000f) * maxOffsetInSlice * _sliceAngle;
+            float offset = (random.Range(-1000, 1001) / 1000f) * _maxOffsetInSlice * _sliceAngle;
             _targetAngle = _sliceAngle * targetIndex - _pointerAngle + offset;
 
-            float current = wheelTransform.localEulerAngles.z;
+            float current = _wheelTransform.localEulerAngles.z;
             float toTarget = Mathf.Repeat(current - _targetAngle, 360f);   // clockwise distance
-            float totalRotation = toTarget + fullTurns * 360f;
+            float totalRotation = toTarget + _fullTurns * 360f;
 
-            lastEulerZ = current;
-            unwrappedAngle = current;
-            lastSliceUnderPointer = SliceUnderPointer(_pointerAngle, _sliceAngle);
+            _lastEulerZ = current;
+            _unwrappedAngle = current;
+            _lastSliceUnderPointer = SliceUnderPointer(_pointerAngle, _sliceAngle);
 
-            spinTween = wheelTransform
-                .DOLocalRotate(new Vector3(0f, 0f, -totalRotation), duration, RotateMode.LocalAxisAdd)
-                .SetEase(ease)
+            _spinTween = _wheelTransform
+                .DOLocalRotate(new Vector3(0f, 0f, -totalRotation), _duration, RotateMode.LocalAxisAdd)
+                .SetEase(_ease)
                 .SetLink(gameObject)
                 .OnUpdate(UpdateTicks)
                 .OnComplete(OnSpinComplete);
@@ -71,8 +72,8 @@ namespace VertigoDemo.UI
 
         private void OnSpinComplete()
         {
-            wheelTransform.localEulerAngles = new Vector3(0f, 0f, _targetAngle); // exact final angle
-            spinTween = null;
+            _wheelTransform.localEulerAngles = new Vector3(0f, 0f, _targetAngle); // exact final angle
+            _spinTween = null;
             if (_onComplete != null)
             {
                 _onComplete();
@@ -82,38 +83,38 @@ namespace VertigoDemo.UI
         // Degrees clockwise from the top of the wheel to the pointer.
         private float PointerAngle()
         {
-            Vector2 direction = pointer.localPosition - wheelTransform.localPosition;
+            Vector2 direction = _pointer.localPosition - _wheelTransform.localPosition;
             return Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
         }
 
         private void UpdateTicks()
         {
-            float eulerZ = wheelTransform.localEulerAngles.z;
-            unwrappedAngle += Mathf.DeltaAngle(lastEulerZ, eulerZ);
-            lastEulerZ = eulerZ;
+            float eulerZ = _wheelTransform.localEulerAngles.z;
+            _unwrappedAngle += Mathf.DeltaAngle(_lastEulerZ, eulerZ);
+            _lastEulerZ = eulerZ;
 
             int slice = SliceUnderPointer(_pointerAngle, _sliceAngle);
-            if (slice == lastSliceUnderPointer) return;
-            lastSliceUnderPointer = slice;
+            if (slice == _lastSliceUnderPointer) return;
+            _lastSliceUnderPointer = slice;
 
-            if (!tickClip || Time.time - lastTickTime < minTickInterval) return;
-            lastTickTime = Time.time;
-            audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
-            audioSource.PlayOneShot(tickClip);
+            if (!_tickClip || Time.time - _lastTickTime < _minTickInterval) return;
+            _lastTickTime = Time.time;
+            _audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
+            _audioSource.PlayOneShot(_tickClip);
         }
 
         private int SliceUnderPointer(float pointerAngle, float sliceAngle) =>
-            Mathf.FloorToInt((pointerAngle + unwrappedAngle) / sliceAngle + 0.5f);
+            Mathf.FloorToInt((pointerAngle + _unwrappedAngle) / sliceAngle + 0.5f);
         
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            wheelTransform = transform.FindDeep(WheelTransformName) as RectTransform;
-            pointer = transform.FindDeep(PointerName) as RectTransform;
-            audioSource = GetComponent<AudioSource>();
+            _wheelTransform = transform.FindDeep(WHEEL_TRANSFORM_NAME) as RectTransform;
+            _pointer = transform.FindDeep(POINTER_NAME) as RectTransform;
+            _audioSource = GetComponent<AudioSource>();
 
-            if (!wheelTransform || !pointer)
+            if (!_wheelTransform || !_pointer)
                 Debug.LogWarning($"{name}: wheel or pointer not found.", this);
         }
 #endif

@@ -1,6 +1,7 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using VertigoDemo.Core;
 
@@ -8,25 +9,25 @@ namespace VertigoDemo.UI
 {
     public class ResultPanelViewMono : MonoBehaviour
     {
-        private const string PopupName = "ui_animator_popup_result";
-        private const string IconName = "ui_image_result_icon_value";
-        private const string TitleName = "ui_text_result_title_value";
-        private const string RestartButtonName = "ui_button_restart";
-        private const string RestartTextName = "ui_text_restart_value";
+        private const string POPUP_NAME = "ui_animator_popup_result";
+        private const string ICON_NAME = "ui_image_result_icon_value";
+        private const string TITLE_NAME = "ui_text_result_title_value";
+        private const string RESTART_BUTTON_NAME = "ui_button_restart";
+        private const string RESTART_TEXT_NAME = "ui_text_restart_value";
         private const string LOSE_TITLE = "BOMB! ALL REWARDS LOST";
         private const string LOSE_BUTTON = "RESTART";
         private const string WIN_TITLE = "REWARDS COLLECTED!";
         private const string WIN_BUTTON = "PLAY AGAIN";
 
-        [SerializeField, HideInInspector] private RectTransform popup;
-        [SerializeField, HideInInspector] private Image icon;
-        [SerializeField, HideInInspector] private TMP_Text title;
-        [SerializeField, HideInInspector] private Button restartButton;
-        [SerializeField, HideInInspector] private TMP_Text restartText;
+        [SerializeField, HideInInspector, FormerlySerializedAs("popup")] private RectTransform _popup;
+        [SerializeField, HideInInspector, FormerlySerializedAs("icon")] private Image _icon;
+        [SerializeField, HideInInspector, FormerlySerializedAs("title")] private TMP_Text _title;
+        [SerializeField, HideInInspector, FormerlySerializedAs("restartButton")] private Button _restartButton;
+        [SerializeField, HideInInspector, FormerlySerializedAs("restartText")] private TMP_Text _restartText;
 
         [SerializeField] private Sprite _loseIcon;
         [SerializeField] private Sprite _winIcon;
-        [SerializeField, Min(0f)] private float popDuration = 0.3f;
+        [SerializeField, Min(0f), FormerlySerializedAs("popDuration")] private float _popDuration = 0.3f;
 
         private IEventBus _bus;
 
@@ -36,9 +37,9 @@ namespace VertigoDemo.UI
             _bus.Subscribe<SessionStateChangedEvent>(OnStateChanged);
         }
 
-        private void OnEnable() => restartButton.onClick.AddListener(OnRestartClicked);
+        private void OnEnable() => _restartButton.onClick.AddListener(OnRestartClicked);
 
-        private void OnDisable() => restartButton.onClick.RemoveListener(OnRestartClicked);
+        private void OnDisable() => _restartButton.onClick.RemoveListener(OnRestartClicked);
 
         private void OnDestroy()
         {
@@ -66,13 +67,13 @@ namespace VertigoDemo.UI
 
         private void Show(Sprite iconSprite, string titleText, string buttonText)
         {
-            icon.sprite = iconSprite;
-            title.text = titleText;
-            restartText.text = buttonText;
+            _icon.sprite = iconSprite;
+            _title.text = titleText;
+            _restartText.text = buttonText;
 
             gameObject.SetActive(true);
-            popup.localScale = Vector3.zero;
-            popup.DOScale(1f, popDuration).SetEase(Ease.OutBack).SetLink(gameObject);
+            _popup.localScale = Vector3.zero;
+            _popup.DOScale(1f, _popDuration).SetEase(Ease.OutBack).SetLink(gameObject);
         }
 
         private void Hide() => gameObject.SetActive(false);
@@ -85,11 +86,11 @@ namespace VertigoDemo.UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            popup = transform.FindDeep(PopupName) as RectTransform;
-            icon = FindComponent<Image>(IconName);
-            title = FindComponent<TMP_Text>(TitleName);
-            restartButton = FindComponent<Button>(RestartButtonName);
-            restartText = FindComponent<TMP_Text>(RestartTextName);
+            _popup = transform.FindDeep(POPUP_NAME) as RectTransform;
+            _icon = FindComponent<Image>(ICON_NAME);
+            _title = FindComponent<TMP_Text>(TITLE_NAME);
+            _restartButton = FindComponent<Button>(RESTART_BUTTON_NAME);
+            _restartText = FindComponent<TMP_Text>(RESTART_TEXT_NAME);
         }
 
         private T FindComponent<T>(string childName) where T : Component

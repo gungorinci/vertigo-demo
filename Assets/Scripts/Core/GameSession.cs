@@ -13,7 +13,7 @@ namespace VertigoDemo.Core
 
     public class GameSession<TReward>
     {
-        private readonly Dictionary<TReward, int> collected = new Dictionary<TReward, int>();
+        private readonly Dictionary<TReward, int> _collected = new Dictionary<TReward, int>();
         private readonly IEventBus _bus;
 
         public GameSession(IEventBus bus)
@@ -23,11 +23,11 @@ namespace VertigoDemo.Core
 
         public int Zone { get; private set; } = 1;
         public SessionState State { get; private set; } = SessionState.Idle;
-        public IReadOnlyDictionary<TReward, int> Collected => collected;
+        public IReadOnlyDictionary<TReward, int> Collected => _collected;
 
         public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
         public bool CanSpin => State == SessionState.Idle;
-        public bool CanLeave => !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, collected.Count > 0);
+        public bool CanLeave => !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, _collected.Count > 0);
 
         public void BeginSpin()
         {
@@ -46,9 +46,9 @@ namespace VertigoDemo.Core
                 return;
             }
 
-            collected.TryGetValue(reward, out int total);
+            _collected.TryGetValue(reward, out int total);
             total += amount;
-            collected[reward] = total;
+            _collected[reward] = total;
             _bus.Publish(new RewardChangedEvent<TReward>(reward, total));
 
             Zone++;
@@ -72,7 +72,7 @@ namespace VertigoDemo.Core
 
         private void ClearRewards()
         {
-            collected.Clear();
+            _collected.Clear();
             _bus.Publish(new RewardsClearedEvent());
         }
 

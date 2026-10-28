@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VertigoDemo.Core;
 using VertigoDemo.Data;
 using VertigoDemo.UI;
@@ -11,42 +12,42 @@ namespace VertigoDemo.Game
         [SerializeField] private List<ZoneTypeData> _zoneTypes = new List<ZoneTypeData>();
         [SerializeField] private RandomSettings _randomSettings;
 
-        [SerializeField, Min(0f)] private float resultDelay = 1f;
-        [SerializeField, Min(0f)] private float flyDelay = 0.4f;
+        [SerializeField, Min(0f), FormerlySerializedAs("resultDelay")] private float _resultDelay = 1f;
+        [SerializeField, Min(0f), FormerlySerializedAs("flyDelay")] private float _flyDelay = 0.4f;
 
-        [SerializeField, HideInInspector] private ControlsViewMono controls;
-        [SerializeField, HideInInspector] private WheelViewMono wheelView;
-        [SerializeField, HideInInspector] private WheelSpinAnimatorMono spinAnimator;
-        [SerializeField, HideInInspector] private ResultPanelViewMono resultPanel;
-        [SerializeField, HideInInspector] private HudViewMono hud;
-        [SerializeField, HideInInspector] private RewardHudViewMono rewardHud;
-        [SerializeField, HideInInspector] private WheelWinEffectMono winEffect;
-        [SerializeField, HideInInspector] private RewardFlyEffectMono rewardFly;
-        [SerializeField, HideInInspector] private WalletViewMono walletView;
+        [SerializeField, HideInInspector, FormerlySerializedAs("controls")] private ControlsViewMono _controls;
+        [SerializeField, HideInInspector, FormerlySerializedAs("wheelView")] private WheelViewMono _wheelView;
+        [SerializeField, HideInInspector, FormerlySerializedAs("spinAnimator")] private WheelSpinAnimatorMono _spinAnimator;
+        [SerializeField, HideInInspector, FormerlySerializedAs("resultPanel")] private ResultPanelViewMono _resultPanel;
+        [SerializeField, HideInInspector, FormerlySerializedAs("hud")] private HudViewMono _hud;
+        [SerializeField, HideInInspector, FormerlySerializedAs("rewardHud")] private RewardHudViewMono _rewardHud;
+        [SerializeField, HideInInspector, FormerlySerializedAs("winEffect")] private WheelWinEffectMono _winEffect;
+        [SerializeField, HideInInspector, FormerlySerializedAs("rewardFly")] private RewardFlyEffectMono _rewardFly;
+        [SerializeField, HideInInspector, FormerlySerializedAs("walletView")] private WalletViewMono _walletView;
 
-        private IRandomSource random;
-        private readonly IEventBus bus = new EventBus();
-        private GameSession<RewardData> session;
-        private SpinFlow spinFlow;
-        private EconomyPresenter economy;
-        private ZonePresenter zones;
+        private IRandomSource _random;
+        private readonly IEventBus _bus = new EventBus();
+        private GameSession<RewardData> _session;
+        private SpinFlow _spinFlow;
+        private EconomyPresenter _economy;
+        private ZonePresenter _zones;
 
         private void Start()
         {
             List<ZoneTypeData> zoneTypes = CollectZoneTypes();
-            random = _randomSettings.CreateSource();
-            session = new GameSession<RewardData>(bus);
-            resultPanel.Bind(bus);
-            controls.Bind(bus);
-            rewardHud.Bind(bus);
-            spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
-                rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
-            economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards(zoneTypes));
-            zones = new ZonePresenter(bus, session, new ZoneSchedule<ZoneTypeData>(zoneTypes),
-                random, spinFlow, wheelView, winEffect, hud);
+            _random = _randomSettings.CreateSource();
+            _session = new GameSession<RewardData>(_bus);
+            _resultPanel.Bind(_bus);
+            _controls.Bind(_bus);
+            _rewardHud.Bind(_bus);
+            _spinFlow = new SpinFlow(_bus, _session, _random, _wheelView, _spinAnimator, _winEffect,
+                _rewardHud, _rewardFly, gameObject, _resultDelay, _flyDelay);
+            _economy = new EconomyPresenter(_bus, _session, new FileSaveStore(), _walletView, CollectRewards(zoneTypes));
+            _zones = new ZonePresenter(_bus, _session, new ZoneSchedule<ZoneTypeData>(zoneTypes),
+                _random, _spinFlow, _wheelView, _winEffect, _hud);
             Subscribe();
-            zones.ShowZone();
-            session.AnnounceState();
+            _zones.ShowZone();
+            _session.AnnounceState();
         }
 
         // ZoneSchedule lives in Core and cannot see Unity's fake null, so empty or missing slots are dropped here.
@@ -84,61 +85,61 @@ namespace VertigoDemo.Game
 
         private void Subscribe()
         {
-            bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
-            bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
+            _bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
+            _bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
         }
 
         private void OnDestroy()
         {
-            bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
-            bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
-            if (spinFlow != null)
+            _bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
+            _bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
+            if (_spinFlow != null)
             {
-                spinFlow.Dispose();
+                _spinFlow.Dispose();
             }
-            if (economy != null)
+            if (_economy != null)
             {
-                economy.Dispose();
+                _economy.Dispose();
             }
-            if (zones != null)
+            if (_zones != null)
             {
-                zones.Dispose();
+                _zones.Dispose();
             }
         }
 
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
-            if (!session.CanLeave)
+            if (!_session.CanLeave)
             {
-                Debug.LogWarning($"Leave request ignored in zone {session.Zone} while the session is {session.State}.");
+                Debug.LogWarning($"Leave request ignored in zone {_session.Zone} while the session is {_session.State}.");
                 return;
             }
 
-            session.Leave();
+            _session.Leave();
         }
 
         private void OnRestartRequested(RestartRequestedEvent evt)
         {
-            session.Restart();
+            _session.Restart();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            controls = GetComponentInChildren<ControlsViewMono>(true);
-            wheelView = GetComponentInChildren<WheelViewMono>(true);
-            spinAnimator = GetComponentInChildren<WheelSpinAnimatorMono>(true);
+            _controls = GetComponentInChildren<ControlsViewMono>(true);
+            _wheelView = GetComponentInChildren<WheelViewMono>(true);
+            _spinAnimator = GetComponentInChildren<WheelSpinAnimatorMono>(true);
 
-            resultPanel = GetComponentInChildren<ResultPanelViewMono>(true);
-            hud = GetComponentInChildren<HudViewMono>(true);
-            rewardHud = GetComponentInChildren<RewardHudViewMono>(true);
-            winEffect = GetComponentInChildren<WheelWinEffectMono>(true);
-            rewardFly = GetComponentInChildren<RewardFlyEffectMono>(true);
-            walletView = GetComponentInChildren<WalletViewMono>(true);
+            _resultPanel = GetComponentInChildren<ResultPanelViewMono>(true);
+            _hud = GetComponentInChildren<HudViewMono>(true);
+            _rewardHud = GetComponentInChildren<RewardHudViewMono>(true);
+            _winEffect = GetComponentInChildren<WheelWinEffectMono>(true);
+            _rewardFly = GetComponentInChildren<RewardFlyEffectMono>(true);
+            _walletView = GetComponentInChildren<WalletViewMono>(true);
 
-            if (!controls || !wheelView || !spinAnimator
-                || !resultPanel || !hud || !rewardHud || !winEffect || !rewardFly
-                || !walletView)
+            if (!_controls || !_wheelView || !_spinAnimator
+                || !_resultPanel || !_hud || !_rewardHud || !_winEffect || !_rewardFly
+                || !_walletView)
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
         }
 #endif

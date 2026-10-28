@@ -5,9 +5,9 @@ namespace VertigoDemo.Tests
 {
     public class ZoneProgressionTests
     {
-        private const string Bronze = "bronze";
-        private const string Silver = "silver";
-        private const string Gold = "gold";
+        private const string BRONZE = "bronze";
+        private const string SILVER = "silver";
+        private const string GOLD = "gold";
 
         private class TestZoneType : IZoneType
         {
@@ -23,36 +23,36 @@ namespace VertigoDemo.Tests
             public bool HasBomb { get; }
         }
 
-        private ZoneSchedule<TestZoneType> schedule;
-        private GameSession<string> session;
+        private ZoneSchedule<TestZoneType> _schedule;
+        private GameSession<string> _session;
 
         [SetUp]
         public void SetUp()
         {
-            schedule = new ZoneSchedule<TestZoneType>(new[]
+            _schedule = new ZoneSchedule<TestZoneType>(new[]
             {
-                new TestZoneType(Bronze, 1, true),
-                new TestZoneType(Silver, 5, false),
-                new TestZoneType(Gold, 30, false)
+                new TestZoneType(BRONZE, 1, true),
+                new TestZoneType(SILVER, 5, false),
+                new TestZoneType(GOLD, 30, false)
             });
-            session = new GameSession<string>(new EventBus());
+            _session = new GameSession<string>(new EventBus());
         }
 
-        [TestCase(1, Bronze, true, false)]
-        [TestCase(2, Bronze, true, true)]
-        [TestCase(5, Silver, false, true)]
-        [TestCase(6, Bronze, true, true)]
-        [TestCase(30, Gold, false, true)]
-        [TestCase(60, Gold, false, true)]
-        [TestCase(65, Silver, false, true)]
+        [TestCase(1, BRONZE, true, false)]
+        [TestCase(2, BRONZE, true, true)]
+        [TestCase(5, SILVER, false, true)]
+        [TestCase(6, BRONZE, true, true)]
+        [TestCase(30, GOLD, false, true)]
+        [TestCase(60, GOLD, false, true)]
+        [TestCase(65, SILVER, false, true)]
         public void Zone_ShowsExpectedWheel(int zone, string expectedWheel, bool hasBomb, bool canLeave)
         {
             WinUntil(zone);
 
-            Assert.AreEqual(zone, session.Zone);
-            Assert.AreEqual(expectedWheel, schedule.For(session.Zone).Name);
-            Assert.AreEqual(hasBomb, schedule.For(session.Zone).HasBomb);
-            Assert.AreEqual(canLeave, session.CanLeave);
+            Assert.AreEqual(zone, _session.Zone);
+            Assert.AreEqual(expectedWheel, _schedule.For(_session.Zone).Name);
+            Assert.AreEqual(hasBomb, _schedule.For(_session.Zone).HasBomb);
+            Assert.AreEqual(canLeave, _session.CanLeave);
         }
 
         [TestCase(1, 5)]
@@ -62,7 +62,7 @@ namespace VertigoDemo.Tests
         {
             int nextZone;
 
-            Assert.IsTrue(schedule.TryFindNextSpecialZone(zone, out nextZone));
+            Assert.IsTrue(_schedule.TryFindNextSpecialZone(zone, out nextZone));
             Assert.AreEqual(expectedZone, nextZone);
         }
 
@@ -71,20 +71,20 @@ namespace VertigoDemo.Tests
         {
             var withPlatinum = new ZoneSchedule<TestZoneType>(new[]
             {
-                new TestZoneType(Bronze, 1, true),
-                new TestZoneType(Silver, 5, false),
+                new TestZoneType(BRONZE, 1, true),
+                new TestZoneType(SILVER, 5, false),
                 new TestZoneType("platinum", 50, false)
             });
 
             Assert.AreEqual("platinum", withPlatinum.For(50).Name);
-            Assert.AreEqual(Silver, withPlatinum.For(55).Name);
+            Assert.AreEqual(SILVER, withPlatinum.For(55).Name);
         }
 
         [Test]
         public void Schedule_NeedsATypeForEveryZone()
         {
             Assert.Throws<System.ArgumentException>(() =>
-                new ZoneSchedule<TestZoneType>(new[] { new TestZoneType(Silver, 5, false) }));
+                new ZoneSchedule<TestZoneType>(new[] { new TestZoneType(SILVER, 5, false) }));
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace VertigoDemo.Tests
         {
             WinUntil(5);
 
-            Assert.AreEqual(4, session.Collected["cash"]);
+            Assert.AreEqual(4, _session.Collected["cash"]);
         }
 
         [Test]
@@ -100,23 +100,23 @@ namespace VertigoDemo.Tests
         {
             WinUntil(7);
 
-            session.BeginSpin();
-            session.CompleteSpin("bomb", 1, isBomb: true);
+            _session.BeginSpin();
+            _session.CompleteSpin("bomb", 1, isBomb: true);
 
-            Assert.AreEqual(SessionState.Lost, session.State);
-            Assert.IsEmpty(session.Collected);
+            Assert.AreEqual(SessionState.Lost, _session.State);
+            Assert.IsEmpty(_session.Collected);
 
-            session.Restart();
+            _session.Restart();
 
-            Assert.AreEqual(1, session.Zone);
-            Assert.AreEqual(SessionState.Idle, session.State);
+            Assert.AreEqual(1, _session.Zone);
+            Assert.AreEqual(SessionState.Idle, _session.State);
         }
 
         [Test]
         public void Leave_IsRejectedBeforeAnyReward()
         {
-            Assert.IsFalse(session.CanLeave);
-            Assert.Throws<System.InvalidOperationException>(() => session.Leave());
+            Assert.IsFalse(_session.CanLeave);
+            Assert.Throws<System.InvalidOperationException>(() => _session.Leave());
         }
 
         [Test]
@@ -124,21 +124,21 @@ namespace VertigoDemo.Tests
         {
             WinUntil(3);
 
-            Assert.AreEqual(Bronze, schedule.For(session.Zone).Name);
-            Assert.IsTrue(session.CanLeave);
+            Assert.AreEqual(BRONZE, _schedule.For(_session.Zone).Name);
+            Assert.IsTrue(_session.CanLeave);
 
-            session.Leave();
+            _session.Leave();
 
-            Assert.AreEqual(SessionState.Left, session.State);
+            Assert.AreEqual(SessionState.Left, _session.State);
         }
 
         // Plays winning spins (1 cash each) until the session reaches the given zone.
         private void WinUntil(int zone)
         {
-            while (session.Zone < zone)
+            while (_session.Zone < zone)
             {
-                session.BeginSpin();
-                session.CompleteSpin("cash", 1, isBomb: false);
+                _session.BeginSpin();
+                _session.CompleteSpin("cash", 1, isBomb: false);
             }
         }
     }
