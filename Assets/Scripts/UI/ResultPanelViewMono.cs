@@ -14,10 +14,6 @@ namespace VertigoDemo.UI
         private const string TITLE_NAME = "ui_text_result_title_value";
         private const string RESTART_BUTTON_NAME = "ui_button_restart";
         private const string RESTART_TEXT_NAME = "ui_text_restart_value";
-        private const string LOSE_TITLE = "BOMB! ALL REWARDS LOST";
-        private const string LOSE_BUTTON = "RESTART";
-        private const string WIN_TITLE = "REWARDS COLLECTED!";
-        private const string WIN_BUTTON = "PLAY AGAIN";
 
         [SerializeField, HideInInspector, FormerlySerializedAs("popup")] private RectTransform _popup;
         [SerializeField, HideInInspector, FormerlySerializedAs("icon")] private Image _icon;
@@ -69,11 +65,11 @@ namespace VertigoDemo.UI
         {
             if (evt.State == SessionState.Lost)
             {
-                Show(_loseIcon, LOSE_TITLE, LOSE_BUTTON);
+                Show(_loseIcon, UiTexts.LOSE_TITLE, UiTexts.LOSE_BUTTON);
             }
             else if (evt.State == SessionState.Left)
             {
-                Show(_winIcon, WIN_TITLE, WIN_BUTTON);
+                Show(_winIcon, UiTexts.WIN_TITLE, UiTexts.WIN_BUTTON);
             }
             else if (evt.State == SessionState.Idle)
             {

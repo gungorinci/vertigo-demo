@@ -25,7 +25,7 @@ namespace VertigoDemo.UI
 
             _animator.DOKill(true);
             _animator.localScale = Vector3.one;
-            _animator.DOPunchScale(Vector3.one * 0.2f, 0.3f).SetLink(gameObject);
+            _animator.DOPunchScale(Vector3.one * UiEffects.BOX_PUNCH_SCALE, UiEffects.BOX_PUNCH_DURATION).SetLink(gameObject);
         }
 
         #endregion

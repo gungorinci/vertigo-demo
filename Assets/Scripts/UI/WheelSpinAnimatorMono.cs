@@ -11,8 +11,6 @@ namespace VertigoDemo.UI
     {
         private const string WHEEL_TRANSFORM_NAME = "ui_animator_wheel";
         private const string POINTER_NAME = "ui_image_pointer_value";
-        private const float PITCH_VARIATION = 0.05f;
-        private const int PITCH_STEPS = 1000;
 
         [SerializeField, HideInInspector, FormerlySerializedAs("wheelTransform")] private RectTransform _wheelTransform;
         [SerializeField, HideInInspector, FormerlySerializedAs("pointer")] private RectTransform _pointer;
@@ -54,14 +52,15 @@ namespace VertigoDemo.UI
             _random = random;
 
             _onComplete = onComplete;
-            _sliceAngle = 360f / sliceCount;
+            _sliceAngle = UiEffects.DEGREES_PER_TURN / sliceCount;
             _pointerAngle = PointerAngle();
-            float offset = (random.Range(-1000, 1001) / 1000f) * _maxOffsetInSlice * _sliceAngle;
+            int offsetStep = random.Range(-UiEffects.SPIN_OFFSET_STEPS, UiEffects.SPIN_OFFSET_STEPS + 1);
+            float offset = (float)offsetStep / UiEffects.SPIN_OFFSET_STEPS * _maxOffsetInSlice * _sliceAngle;
             _targetAngle = _sliceAngle * targetIndex - _pointerAngle + offset;
 
             float current = _wheelTransform.localEulerAngles.z;
-            float toTarget = Mathf.Repeat(current - _targetAngle, 360f);   // clockwise distance
-            float totalRotation = toTarget + _fullTurns * 360f;
+            float toTarget = Mathf.Repeat(current - _targetAngle, UiEffects.DEGREES_PER_TURN);   // clockwise distance
+            float totalRotation = toTarget + _fullTurns * UiEffects.DEGREES_PER_TURN;
 
             _lastEulerZ = current;
             _unwrappedAngle = current;
@@ -107,7 +106,8 @@ namespace VertigoDemo.UI
                 return;
             }
             _lastTickTime = Time.time;
-            _audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
+            int pitchStep = _random.Range(-UiEffects.TICK_PITCH_STEPS, UiEffects.TICK_PITCH_STEPS + 1);
+            _audioSource.pitch = 1f + UiEffects.TICK_PITCH_VARIATION * pitchStep / UiEffects.TICK_PITCH_STEPS;
             _audioSource.PlayOneShot(_tickClip);
         }
 

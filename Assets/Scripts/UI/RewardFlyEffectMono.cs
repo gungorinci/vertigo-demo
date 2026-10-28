@@ -36,7 +36,7 @@ namespace VertigoDemo.UI
 
             DOTween.Sequence()
                 .Join(rt.DOPath(new[] { middle, to }, _duration, PathType.CatmullRom).SetEase(Ease.InOutQuad))
-                .Join(rt.DOScale(0.6f, _duration))
+                .Join(rt.DOScale(UiEffects.FLY_END_SCALE, _duration))
                 .OnComplete(OnFlyComplete)
                 .SetLink(gameObject);
         }

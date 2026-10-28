@@ -18,17 +18,17 @@ namespace VertigoDemo.UI
 
         public void ShowZone(int zone, string title, string info)
         {
-            _zoneText.text = $"ZONE {zone}";
+            _zoneText.text = string.Format(UiTexts.ZONE_FORMAT, zone);
             _titleText.text = title;
             _infoText.text = info;
         }
 
         public void ShowCountdown(int zone, string title, string nextZoneName, int spinsLeft)
         {
-            string info = $"{nextZoneName} zone in {spinsLeft} spins";
+            string info = string.Format(UiTexts.COUNTDOWN_FORMAT, nextZoneName, spinsLeft);
             if (spinsLeft == 1)
             {
-                info = $"{nextZoneName} zone next!";
+                info = string.Format(UiTexts.COUNTDOWN_NEXT_FORMAT, nextZoneName);
             }
             ShowZone(zone, title, info);
         }
@@ -36,9 +36,9 @@ namespace VertigoDemo.UI
         // Shown before the first spin of a run: the rules in one line.
         public void ShowIntro(int zone)
         {
-            _zoneText.text = $"ZONE {zone}";
-            _titleText.text = "SPIN TO WIN! REWARDS GROW EVERY ZONE";
-            _infoText.text = "<size=85%>Avoid the bomb! Every 5th zone is safe, every 30th is golden. Leave after any spin to keep it all.</size>";
+            _zoneText.text = string.Format(UiTexts.ZONE_FORMAT, zone);
+            _titleText.text = UiTexts.INTRO_TITLE;
+            _infoText.text = UiTexts.INTRO_INFO;
         }
 
         #endregion

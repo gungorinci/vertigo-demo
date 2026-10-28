@@ -38,15 +38,15 @@ namespace VertigoDemo.UI
             // Glow: pops in, then pulses until hidden.
             _glow.gameObject.SetActive(true);
             _glow.rectTransform.localScale = Vector3.zero;
-            _glow.rectTransform.DOScale(1f, 0.25f).SetEase(Ease.OutBack).SetLink(_glow.gameObject)
+            _glow.rectTransform.DOScale(1f, UiEffects.GLOW_POP_DURATION).SetEase(Ease.OutBack).SetLink(_glow.gameObject)
                 .OnComplete(StartGlowPulse);
 
             // Flash: grows and fades out once.
             _flash.gameObject.SetActive(true);
-            _flash.rectTransform.localScale = Vector3.one * 0.3f;
+            _flash.rectTransform.localScale = Vector3.one * UiEffects.FLASH_START_SCALE;
             Color c = _flash.color;
             _flash.color = new Color(c.r, c.g, c.b, 1f);
-            _flash.rectTransform.DOScale(1.4f, _flashDuration).SetEase(Ease.OutQuad).SetLink(_flash.gameObject);
+            _flash.rectTransform.DOScale(UiEffects.FLASH_END_SCALE, _flashDuration).SetEase(Ease.OutQuad).SetLink(_flash.gameObject);
             _flash.DOFade(0f, _flashDuration).SetLink(_flash.gameObject);
         }
 
@@ -65,8 +65,8 @@ namespace VertigoDemo.UI
 
         private void StartGlowPulse()
         {
-            _glow.rectTransform.DOScale(1.15f, _pulseDuration).SetEase(Ease.InOutSine)
-                .SetLoops(-1, LoopType.Yoyo).SetLink(_glow.gameObject);
+            _glow.rectTransform.DOScale(UiEffects.GLOW_PULSE_SCALE, _pulseDuration).SetEase(Ease.InOutSine)
+                .SetLoops(UiEffects.INFINITE_LOOPS, LoopType.Yoyo).SetLink(_glow.gameObject);
         }
 
         private static void PlaceAt(RectTransform effect, RectTransform icon, bool isBehindIcon)
