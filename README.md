@@ -66,12 +66,15 @@ Three layers, so the rules can be tested without Unity:
    - `ZoneTypeData`: a zone type's interval, bomb rule, wheel and HUD texts.
      A new zone type is a new asset in the GameController's list, no code change.
    - `WheelConfig`: a wheel's sprites and its 8 slices. Each `WheelSlice` has
-     a reward pool, an amount range and a weight.
+     a reward pool, an amount range and a weight. `RolledSlice` is one slice
+     after its reward and amount are rolled.
 3. **Views / Game**
    - `GameController` is the thin composition root: it wires the session,
      the wheel views and the buttons together.
    - Views (`WheelView`, `WheelSpinAnimator`, `HudView`, `RewardHudView`,
      `ResultPanelView`, effects) only show what they are given.
+   - Dependencies point one way: Game uses UI, Data and Core; UI uses Data
+     and Core and never Game.
 
 **Spin flow:** the result is chosen first by `WeightedPicker`, then
 `WheelSpinAnimator` rotates the wheel so that slice stops under the pointer

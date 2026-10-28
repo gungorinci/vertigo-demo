@@ -1,6 +1,4 @@
-using VertigoDemo.Data;
-
-namespace VertigoDemo.Game
+namespace VertigoDemo.Data
 {
     public class RolledSlice
     {
