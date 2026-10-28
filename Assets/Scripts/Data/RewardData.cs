@@ -11,9 +11,20 @@ namespace VertigoDemo.Data
         [SerializeField, FormerlySerializedAs("isBomb")] private bool _isBomb;
         [SerializeField] private bool _isCurrency;
 
-        public string DisplayName => _displayName;
-        public Sprite Icon => _icon;
-        public bool IsBomb => _isBomb;
+        public string DisplayName
+        {
+            get { return _displayName; }
+        }
+
+        public Sprite Icon
+        {
+            get { return _icon; }
+        }
+
+        public bool IsBomb
+        {
+            get { return _isBomb; }
+        }
 
         public bool IsCurrency
         {

@@ -23,21 +23,44 @@ namespace VertigoDemo.Core
 
         public int Zone { get; private set; } = 1;
         public SessionState State { get; private set; } = SessionState.Idle;
-        public IReadOnlyDictionary<TReward, int> Collected => _collected;
 
-        public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
-        public bool CanSpin => State == SessionState.Idle;
-        public bool CanLeave => !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, _collected.Count > 0);
+        public IReadOnlyDictionary<TReward, int> Collected
+        {
+            get { return _collected; }
+        }
+
+        public bool IsOver
+        {
+            get { return State == SessionState.Lost || State == SessionState.Left; }
+        }
+
+        public bool CanSpin
+        {
+            get { return State == SessionState.Idle; }
+        }
+
+        public bool CanLeave
+        {
+            get { return !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, _collected.Count > 0); }
+        }
+
+        #region Public API
 
         public void BeginSpin()
         {
-            if (!CanSpin) throw new InvalidOperationException($"Cannot spin while {State}.");
+            if (!CanSpin)
+            {
+                throw new InvalidOperationException($"Cannot spin while {State}.");
+            }
             SetState(SessionState.Spinning);
         }
 
         public void CompleteSpin(TReward reward, int amount, bool isBomb)
         {
-            if (State != SessionState.Spinning) throw new InvalidOperationException("No spin in progress.");
+            if (State != SessionState.Spinning)
+            {
+                throw new InvalidOperationException("No spin in progress.");
+            }
 
             if (isBomb)
             {
@@ -58,7 +81,10 @@ namespace VertigoDemo.Core
 
         public void Leave()
         {
-            if (!CanLeave) throw new InvalidOperationException($"Cannot leave in zone {Zone} while {State}.");
+            if (!CanLeave)
+            {
+                throw new InvalidOperationException($"Cannot leave in zone {Zone} while {State}.");
+            }
             SetState(SessionState.Left);
         }
 
@@ -69,6 +95,15 @@ namespace VertigoDemo.Core
             PublishZone();
             SetState(SessionState.Idle);
         }
+
+        public void AnnounceState()
+        {
+            _bus.Publish(new SessionStateChangedEvent(State, CanSpin, CanLeave));
+        }
+
+        #endregion
+
+        #region Internals
 
         private void ClearRewards()
         {
@@ -82,14 +117,11 @@ namespace VertigoDemo.Core
             AnnounceState();
         }
 
-        public void AnnounceState()
-        {
-            _bus.Publish(new SessionStateChangedEvent(State, CanSpin, CanLeave));
-        }
-
         private void PublishZone()
         {
             _bus.Publish(new ZoneChangedEvent(Zone));
         }
+
+        #endregion
     }
 }

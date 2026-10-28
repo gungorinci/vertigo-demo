@@ -32,6 +32,8 @@ namespace VertigoDemo.Game
         private EconomyPresenter _economy;
         private ZonePresenter _zones;
 
+        #region Unity
+
         private void Start()
         {
             List<ZoneTypeData> zoneTypes = CollectZoneTypes();
@@ -49,6 +51,28 @@ namespace VertigoDemo.Game
             _zones.ShowZone();
             _session.AnnounceState();
         }
+
+        private void OnDestroy()
+        {
+            _bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
+            _bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
+            if (_spinFlow != null)
+            {
+                _spinFlow.Dispose();
+            }
+            if (_economy != null)
+            {
+                _economy.Dispose();
+            }
+            if (_zones != null)
+            {
+                _zones.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region Setup
 
         // ZoneSchedule lives in Core and cannot see Unity's fake null, so empty or missing slots are dropped here.
         private List<ZoneTypeData> CollectZoneTypes()
@@ -89,23 +113,9 @@ namespace VertigoDemo.Game
             _bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
         }
 
-        private void OnDestroy()
-        {
-            _bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
-            _bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
-            if (_spinFlow != null)
-            {
-                _spinFlow.Dispose();
-            }
-            if (_economy != null)
-            {
-                _economy.Dispose();
-            }
-            if (_zones != null)
-            {
-                _zones.Dispose();
-            }
-        }
+        #endregion
+
+        #region Handlers
 
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
@@ -122,6 +132,8 @@ namespace VertigoDemo.Game
         {
             _session.Restart();
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -140,7 +152,9 @@ namespace VertigoDemo.Game
             if (!_controls || !_wheelView || !_spinAnimator
                 || !_resultPanel || !_hud || !_rewardHud || !_winEffect || !_rewardFly
                 || !_walletView)
+            {
                 Debug.LogWarning($"{name}: a button or view was not found.", this);
+            }
         }
 #endif
     }

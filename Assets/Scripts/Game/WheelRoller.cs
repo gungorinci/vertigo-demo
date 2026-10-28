@@ -6,6 +6,8 @@ namespace VertigoDemo.Game
 {
     public static class WheelRoller
     {
+        #region Public API
+
         public static List<RolledSlice> Roll(WheelConfig config, int zone, IRandomSource random)
         {
             var rolled = new List<RolledSlice>(config.Slices.Count);
@@ -33,5 +35,7 @@ namespace VertigoDemo.Game
 
             return rolled;
         }
+
+        #endregion
     }
 }

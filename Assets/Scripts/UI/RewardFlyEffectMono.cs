@@ -18,6 +18,8 @@ namespace VertigoDemo.UI
 
         private Action _onArrived;
 
+        #region Public API
+
         public void Fly(Sprite sprite, RectTransform from, Vector3 to, Action onArrived)
         {
             RectTransform rt = _flyAnimator;
@@ -39,6 +41,10 @@ namespace VertigoDemo.UI
                 .SetLink(gameObject);
         }
 
+        #endregion
+
+        #region Tween callbacks
+
         private void OnFlyComplete()
         {
             _flyAnimator.gameObject.SetActive(false);
@@ -47,6 +53,8 @@ namespace VertigoDemo.UI
                 _onArrived();
             }
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()

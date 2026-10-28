@@ -17,7 +17,16 @@ namespace VertigoDemo.UI
         [SerializeField, Min(0.05f), FormerlySerializedAs("pulseDuration")] private float _pulseDuration = 0.4f;
         [SerializeField, Min(0.05f), FormerlySerializedAs("flashDuration")] private float _flashDuration = 0.5f;
 
-        private void Awake() => Hide();
+        #region Unity
+
+        private void Awake()
+        {
+            Hide();
+        }
+
+        #endregion
+
+        #region Public API
 
         public void Play(int sliceIndex)
         {
@@ -41,12 +50,6 @@ namespace VertigoDemo.UI
             _flash.DOFade(0f, _flashDuration).SetLink(_flash.gameObject);
         }
 
-        private void StartGlowPulse()
-        {
-            _glow.rectTransform.DOScale(1.15f, _pulseDuration).SetEase(Ease.InOutSine)
-                .SetLoops(-1, LoopType.Yoyo).SetLink(_glow.gameObject);
-        }
-
         public void Hide()
         {
             _glow.rectTransform.DOKill();
@@ -56,15 +59,33 @@ namespace VertigoDemo.UI
             _flash.gameObject.SetActive(false);
         }
 
+        #endregion
+
+        #region Effects
+
+        private void StartGlowPulse()
+        {
+            _glow.rectTransform.DOScale(1.15f, _pulseDuration).SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo).SetLink(_glow.gameObject);
+        }
+
         private static void PlaceAt(RectTransform effect, RectTransform icon, bool isBehindIcon)
         {
             effect.SetParent(icon.parent, false);
             effect.anchoredPosition = icon.anchoredPosition;
             effect.localRotation = Quaternion.identity;
 
-            if (isBehindIcon) effect.SetSiblingIndex(icon.GetSiblingIndex());
-            else effect.SetAsLastSibling();
+            if (isBehindIcon)
+            {
+                effect.SetSiblingIndex(icon.GetSiblingIndex());
+            }
+            else
+            {
+                effect.SetAsLastSibling();
+            }
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()

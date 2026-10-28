@@ -4,13 +4,21 @@ namespace VertigoDemo.UI
 {
     public static class TransformExtensions
     {
+        #region Public API
+
         public static Transform FindDeep(this Transform root, string name)
         {
             foreach (Transform child in root)
             {
-                if (child.name == name) return child;
+                if (child.name == name)
+                {
+                    return child;
+                }
                 Transform found = child.FindDeep(name);
-                if (found) return found;
+                if (found)
+                {
+                    return found;
+                }
             }
             return null;
         }
@@ -25,5 +33,7 @@ namespace VertigoDemo.UI
             }
             return child.GetComponent<T>();
         }
+
+        #endregion
     }
 }

@@ -31,15 +31,27 @@ namespace VertigoDemo.UI
 
         private IEventBus _bus;
 
+        #region Public API
+
         public void Bind(IEventBus bus)
         {
             _bus = bus;
             _bus.Subscribe<SessionStateChangedEvent>(OnStateChanged);
         }
 
-        private void OnEnable() => _restartButton.onClick.AddListener(OnRestartClicked);
+        #endregion
 
-        private void OnDisable() => _restartButton.onClick.RemoveListener(OnRestartClicked);
+        #region Unity
+
+        private void OnEnable()
+        {
+            _restartButton.onClick.AddListener(OnRestartClicked);
+        }
+
+        private void OnDisable()
+        {
+            _restartButton.onClick.RemoveListener(OnRestartClicked);
+        }
 
         private void OnDestroy()
         {
@@ -48,6 +60,10 @@ namespace VertigoDemo.UI
                 _bus.Unsubscribe<SessionStateChangedEvent>(OnStateChanged);
             }
         }
+
+        #endregion
+
+        #region Handlers
 
         private void OnStateChanged(SessionStateChangedEvent evt)
         {
@@ -65,6 +81,15 @@ namespace VertigoDemo.UI
             }
         }
 
+        private void OnRestartClicked()
+        {
+            _bus.Publish(new RestartRequestedEvent());
+        }
+
+        #endregion
+
+        #region Popup
+
         private void Show(Sprite iconSprite, string titleText, string buttonText)
         {
             _icon.sprite = iconSprite;
@@ -76,12 +101,12 @@ namespace VertigoDemo.UI
             _popup.DOScale(1f, _popDuration).SetEase(Ease.OutBack).SetLink(gameObject);
         }
 
-        private void Hide() => gameObject.SetActive(false);
-
-        private void OnRestartClicked()
+        private void Hide()
         {
-            _bus.Publish(new RestartRequestedEvent());
+            gameObject.SetActive(false);
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()

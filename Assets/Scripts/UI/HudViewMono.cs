@@ -14,6 +14,8 @@ namespace VertigoDemo.UI
         [SerializeField, HideInInspector, FormerlySerializedAs("titleText")] private TMP_Text _titleText;
         [SerializeField, HideInInspector, FormerlySerializedAs("infoText")] private TMP_Text _infoText;
 
+        #region Public API
+
         public void ShowZone(int zone, string title, string info)
         {
             _zoneText.text = $"ZONE {zone}";
@@ -38,6 +40,8 @@ namespace VertigoDemo.UI
             _titleText.text = "SPIN TO WIN! REWARDS GROW EVERY ZONE";
             _infoText.text = "<size=85%>Avoid the bomb! Every 5th zone is safe, every 30th is golden. Leave after any spin to keep it all.</size>";
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()

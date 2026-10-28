@@ -38,7 +38,12 @@ namespace VertigoDemo.UI
         private float _targetAngle;
         private Action _onComplete;
 
-        public bool IsSpinning => _spinTween != null && _spinTween.IsActive();
+        public bool IsSpinning
+        {
+            get { return _spinTween != null && _spinTween.IsActive(); }
+        }
+
+        #region Public API
 
         public void Spin(int targetIndex, int sliceCount, IRandomSource random, Action onComplete)
         {
@@ -70,6 +75,10 @@ namespace VertigoDemo.UI
                 .OnComplete(OnSpinComplete);
         }
 
+        #endregion
+
+        #region Tween callbacks
+
         private void OnSpinComplete()
         {
             _wheelTransform.localEulerAngles = new Vector3(0f, 0f, _targetAngle); // exact final angle
@@ -80,13 +89,6 @@ namespace VertigoDemo.UI
             }
         }
 
-        // Degrees clockwise from the top of the wheel to the pointer.
-        private float PointerAngle()
-        {
-            Vector2 direction = _pointer.localPosition - _wheelTransform.localPosition;
-            return Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
-        }
-
         private void UpdateTicks()
         {
             float eulerZ = _wheelTransform.localEulerAngles.z;
@@ -94,18 +96,38 @@ namespace VertigoDemo.UI
             _lastEulerZ = eulerZ;
 
             int slice = SliceUnderPointer(_pointerAngle, _sliceAngle);
-            if (slice == _lastSliceUnderPointer) return;
+            if (slice == _lastSliceUnderPointer)
+            {
+                return;
+            }
             _lastSliceUnderPointer = slice;
 
-            if (!_tickClip || Time.time - _lastTickTime < _minTickInterval) return;
+            if (!_tickClip || Time.time - _lastTickTime < _minTickInterval)
+            {
+                return;
+            }
             _lastTickTime = Time.time;
             _audioSource.pitch = 1f + PITCH_VARIATION * (2f * _random.Range(0, PITCH_STEPS + 1) / PITCH_STEPS - 1f);
             _audioSource.PlayOneShot(_tickClip);
         }
 
-        private int SliceUnderPointer(float pointerAngle, float sliceAngle) =>
-            Mathf.FloorToInt((pointerAngle + _unwrappedAngle) / sliceAngle + 0.5f);
-        
+        #endregion
+
+        #region Angles
+
+        // Degrees clockwise from the top of the wheel to the pointer.
+        private float PointerAngle()
+        {
+            Vector2 direction = _pointer.localPosition - _wheelTransform.localPosition;
+            return Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
+        }
+
+        private int SliceUnderPointer(float pointerAngle, float sliceAngle)
+        {
+            return Mathf.FloorToInt((pointerAngle + _unwrappedAngle) / sliceAngle + 0.5f);
+        }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -115,7 +137,9 @@ namespace VertigoDemo.UI
             _audioSource = GetComponent<AudioSource>();
 
             if (!_wheelTransform || !_pointer)
+            {
                 Debug.LogWarning($"{name}: wheel or pointer not found.", this);
+            }
         }
 #endif
     }

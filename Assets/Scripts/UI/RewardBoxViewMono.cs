@@ -16,6 +16,8 @@ namespace VertigoDemo.UI
         [SerializeField, HideInInspector, FormerlySerializedAs("amountText")] private TMP_Text _amountText;
         [SerializeField, HideInInspector, FormerlySerializedAs("animator")] private RectTransform _animator;
 
+        #region Public API
+
         public void Show(Sprite sprite, int total)
         {
             _icon.sprite = sprite;
@@ -25,6 +27,8 @@ namespace VertigoDemo.UI
             _animator.localScale = Vector3.one;
             _animator.DOPunchScale(Vector3.one * 0.2f, 0.3f).SetLink(gameObject);
         }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()

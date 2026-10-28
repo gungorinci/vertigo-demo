@@ -13,14 +13,21 @@ namespace VertigoDemo.UI
         [SerializeField, HideInInspector, FormerlySerializedAs("icon")] private Image _icon;
         [SerializeField, HideInInspector, FormerlySerializedAs("amountText")] private TMP_Text _amountText;
 
+        public RectTransform IconTransform
+        {
+            get { return _icon.rectTransform; }
+        }
+
+        #region Public API
+
         public void Show(Sprite sprite, int amount)
         {
             _icon.sprite = sprite;
             _amountText.text = "x" + amount;
         }
 
-        public RectTransform IconTransform => _icon.rectTransform;
-        
+        #endregion
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -28,7 +35,9 @@ namespace VertigoDemo.UI
             _amountText = transform.FindDeepComponent<TMP_Text>(AMOUNT_TEXT_NAME);
 
             if (!_icon || !_amountText)
+            {
                 Debug.LogWarning($"{name}: slice children not found.", this);
+            }
         }
 #endif
     }

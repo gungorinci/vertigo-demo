@@ -14,14 +14,27 @@ namespace VertigoDemo.Data
         [SerializeField, FormerlySerializedAs("slices")] private List<WheelSlice> _slices = new List<WheelSlice>();
         [SerializeField, Range(0f, 0.5f)] private float _growthPerZone = 0.08f;
 
-        public Sprite WheelSprite => _wheelSprite;
-        public Sprite IndicatorSprite => _indicatorSprite;
-        public IReadOnlyList<WheelSlice> Slices => _slices;
+        public Sprite WheelSprite
+        {
+            get { return _wheelSprite; }
+        }
+
+        public Sprite IndicatorSprite
+        {
+            get { return _indicatorSprite; }
+        }
+
+        public IReadOnlyList<WheelSlice> Slices
+        {
+            get { return _slices; }
+        }
 
         public float GrowthPerZone
         {
             get { return _growthPerZone; }
         }
+
+        #region Public API
 
         public int CountBombSlices()
         {
@@ -39,6 +52,8 @@ namespace VertigoDemo.Data
             }
             return bombSlices;
         }
+
+        #endregion
 
         #region Validation
 

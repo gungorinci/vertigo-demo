@@ -13,9 +13,24 @@ namespace VertigoDemo.Data
         [SerializeField, Min(1), FormerlySerializedAs("maxAmount")] private int _maxAmount = 1;
         [SerializeField, Min(0), FormerlySerializedAs("weight")] private int _weight = 10;
 
-        public IReadOnlyList<RewardData> RewardPool => _rewardPool;
-        public int MinAmount => _minAmount;
-        public int MaxAmount => _maxAmount;
-        public int Weight => _weight;
+        public IReadOnlyList<RewardData> RewardPool
+        {
+            get { return _rewardPool; }
+        }
+
+        public int MinAmount
+        {
+            get { return _minAmount; }
+        }
+
+        public int MaxAmount
+        {
+            get { return _maxAmount; }
+        }
+
+        public int Weight
+        {
+            get { return _weight; }
+        }
     }
 }

@@ -15,6 +15,8 @@ namespace VertigoDemo.UI
         [SerializeField, HideInInspector, FormerlySerializedAs("pointerImage")] private Image _pointerImage;
         [SerializeField, HideInInspector, FormerlySerializedAs("sliceViews")] private WheelSliceViewMono[] _sliceViews;
 
+        #region Public API
+
         public void Show(WheelConfig config, IReadOnlyList<RolledSlice> slices)
         {
             _wheelImage.sprite = config.WheelSprite;
@@ -23,12 +25,20 @@ namespace VertigoDemo.UI
             for (int i = 0; i < _sliceViews.Length && i < slices.Count; i++)
             {
                 RolledSlice slice = slices[i];
-                if (!slice.Reward) continue;
+                if (!slice.Reward)
+                {
+                    continue;
+                }
                 _sliceViews[i].Show(slice.Reward.Icon, slice.Amount);
             }
         }
 
-        public RectTransform GetSliceIcon(int index) => _sliceViews[index].IconTransform;
+        public RectTransform GetSliceIcon(int index)
+        {
+            return _sliceViews[index].IconTransform;
+        }
+
+        #endregion
 
 #if UNITY_EDITOR
         private void OnValidate()
