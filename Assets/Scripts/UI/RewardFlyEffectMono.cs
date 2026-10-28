@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace VertigoDemo.UI
 {
-    public class RewardFlyEffect : MonoBehaviour
+    public class RewardFlyEffectMono : MonoBehaviour
     {
         private const string FlyImageName = "ui_image_reward_fly_value";
         private const string FlyAnimatorName = "ui_animator_reward_fly";

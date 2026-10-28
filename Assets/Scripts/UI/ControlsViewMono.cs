@@ -4,7 +4,7 @@ using VertigoDemo.Core;
 
 namespace VertigoDemo.UI
 {
-    public class ControlsView : MonoBehaviour
+    public class ControlsViewMono : MonoBehaviour
     {
         private const string SPIN_BUTTON_NAME = "ui_button_spin_wheel";
         private const string LEAVE_BUTTON_NAME = "ui_button_leave";

@@ -13,11 +13,11 @@ namespace VertigoDemo.Game
         private readonly IEventBus _bus;
         private readonly GameSession<RewardData> _session;
         private readonly IRandomSource _random;
-        private readonly WheelView _wheelView;
-        private readonly WheelSpinAnimator _spinAnimator;
-        private readonly WheelWinEffect _winEffect;
-        private readonly RewardHudView _rewardHud;
-        private readonly RewardFlyEffect _rewardFly;
+        private readonly WheelViewMono _wheelView;
+        private readonly WheelSpinAnimatorMono _spinAnimator;
+        private readonly WheelWinEffectMono _winEffect;
+        private readonly RewardHudViewMono _rewardHud;
+        private readonly RewardFlyEffectMono _rewardFly;
         private readonly GameObject _owner;
         private readonly float _resultDelay;
         private readonly float _flyDelay;
@@ -31,11 +31,11 @@ namespace VertigoDemo.Game
             IEventBus bus,
             GameSession<RewardData> session,
             IRandomSource random,
-            WheelView wheelView,
-            WheelSpinAnimator spinAnimator,
-            WheelWinEffect winEffect,
-            RewardHudView rewardHud,
-            RewardFlyEffect rewardFly,
+            WheelViewMono wheelView,
+            WheelSpinAnimatorMono spinAnimator,
+            WheelWinEffectMono winEffect,
+            RewardHudViewMono rewardHud,
+            RewardFlyEffectMono rewardFly,
             GameObject owner,
             float resultDelay,
             float flyDelay)

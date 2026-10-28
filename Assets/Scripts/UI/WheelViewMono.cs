@@ -5,14 +5,14 @@ using VertigoDemo.Data;
 
 namespace VertigoDemo.UI
 {
-    public class WheelView : MonoBehaviour
+    public class WheelViewMono : MonoBehaviour
     {
         private const string WheelImageName = "ui_image_spin_wheel_value";
         private const string PointerImageName = "ui_image_pointer_value";
 
         [SerializeField, HideInInspector] private Image wheelImage;
         [SerializeField, HideInInspector] private Image pointerImage;
-        [SerializeField, HideInInspector] private WheelSliceView[] sliceViews;
+        [SerializeField, HideInInspector] private WheelSliceViewMono[] sliceViews;
 
         public void Show(WheelConfig config, IReadOnlyList<RolledSlice> slices)
         {
@@ -34,7 +34,7 @@ namespace VertigoDemo.UI
         {
             wheelImage = FindImage(WheelImageName);
             pointerImage = FindImage(PointerImageName);
-            sliceViews = GetComponentsInChildren<WheelSliceView>(true);
+            sliceViews = GetComponentsInChildren<WheelSliceViewMono>(true);
         }
 
         private Image FindImage(string childName)

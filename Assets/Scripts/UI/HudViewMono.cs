@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VertigoDemo.UI
 {
-    public class HudView : MonoBehaviour
+    public class HudViewMono : MonoBehaviour
     {
         private const string ZoneTextName = "ui_text_zone_value";
         private const string TitleTextName = "ui_text_wheel_title_value";

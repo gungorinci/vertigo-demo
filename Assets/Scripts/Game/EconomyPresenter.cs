@@ -11,7 +11,7 @@ namespace VertigoDemo.Game
         private readonly IEventBus _bus;
         private readonly GameSession<RewardData> _session;
         private readonly ISaveStore _saveStore;
-        private readonly WalletView _walletView;
+        private readonly WalletViewMono _walletView;
         private readonly IInventory<RewardData> _inventory;
         private readonly List<RewardData> _currencies = new List<RewardData>();
 
@@ -19,7 +19,7 @@ namespace VertigoDemo.Game
             IEventBus bus,
             GameSession<RewardData> session,
             ISaveStore saveStore,
-            WalletView walletView,
+            WalletViewMono walletView,
             IReadOnlyList<RewardData> catalog)
         {
             _bus = bus;

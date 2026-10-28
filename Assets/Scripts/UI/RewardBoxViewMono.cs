@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace VertigoDemo.UI
 {
-    public class RewardBoxView : MonoBehaviour
+    public class RewardBoxViewMono : MonoBehaviour
     {
         private const string IconName = "ui_image_reward_icon_value";
         private const string AmountTextName = "ui_text_reward_amount_value";

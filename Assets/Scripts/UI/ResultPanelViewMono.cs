@@ -6,7 +6,7 @@ using VertigoDemo.Core;
 
 namespace VertigoDemo.UI
 {
-    public class ResultPanelView : MonoBehaviour
+    public class ResultPanelViewMono : MonoBehaviour
     {
         private const string PopupName = "ui_animator_popup_result";
         private const string IconName = "ui_image_result_icon_value";

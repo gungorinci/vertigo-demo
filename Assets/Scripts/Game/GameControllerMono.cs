@@ -6,7 +6,7 @@ using VertigoDemo.UI;
 
 namespace VertigoDemo.Game
 {
-    public class GameController : MonoBehaviour
+    public class GameControllerMono : MonoBehaviour
     {
         [SerializeField] private List<ZoneTypeData> _zoneTypes = new List<ZoneTypeData>();
         [SerializeField] private RandomSettings _randomSettings;
@@ -14,15 +14,15 @@ namespace VertigoDemo.Game
         [SerializeField, Min(0f)] private float resultDelay = 1f;
         [SerializeField, Min(0f)] private float flyDelay = 0.4f;
 
-        [SerializeField, HideInInspector] private ControlsView controls;
-        [SerializeField, HideInInspector] private WheelView wheelView;
-        [SerializeField, HideInInspector] private WheelSpinAnimator spinAnimator;
-        [SerializeField, HideInInspector] private ResultPanelView resultPanel;
-        [SerializeField, HideInInspector] private HudView hud;
-        [SerializeField, HideInInspector] private RewardHudView rewardHud;
-        [SerializeField, HideInInspector] private WheelWinEffect winEffect;
-        [SerializeField, HideInInspector] private RewardFlyEffect rewardFly;
-        [SerializeField, HideInInspector] private WalletView walletView;
+        [SerializeField, HideInInspector] private ControlsViewMono controls;
+        [SerializeField, HideInInspector] private WheelViewMono wheelView;
+        [SerializeField, HideInInspector] private WheelSpinAnimatorMono spinAnimator;
+        [SerializeField, HideInInspector] private ResultPanelViewMono resultPanel;
+        [SerializeField, HideInInspector] private HudViewMono hud;
+        [SerializeField, HideInInspector] private RewardHudViewMono rewardHud;
+        [SerializeField, HideInInspector] private WheelWinEffectMono winEffect;
+        [SerializeField, HideInInspector] private RewardFlyEffectMono rewardFly;
+        [SerializeField, HideInInspector] private WalletViewMono walletView;
 
         private IRandomSource random;
         private readonly IEventBus bus = new EventBus();
@@ -125,16 +125,16 @@ namespace VertigoDemo.Game
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            controls = GetComponentInChildren<ControlsView>(true);
-            wheelView = GetComponentInChildren<WheelView>(true);
-            spinAnimator = GetComponentInChildren<WheelSpinAnimator>(true);
+            controls = GetComponentInChildren<ControlsViewMono>(true);
+            wheelView = GetComponentInChildren<WheelViewMono>(true);
+            spinAnimator = GetComponentInChildren<WheelSpinAnimatorMono>(true);
 
-            resultPanel = GetComponentInChildren<ResultPanelView>(true);
-            hud = GetComponentInChildren<HudView>(true);
-            rewardHud = GetComponentInChildren<RewardHudView>(true);
-            winEffect = GetComponentInChildren<WheelWinEffect>(true);
-            rewardFly = GetComponentInChildren<RewardFlyEffect>(true);
-            walletView = GetComponentInChildren<WalletView>(true);
+            resultPanel = GetComponentInChildren<ResultPanelViewMono>(true);
+            hud = GetComponentInChildren<HudViewMono>(true);
+            rewardHud = GetComponentInChildren<RewardHudViewMono>(true);
+            winEffect = GetComponentInChildren<WheelWinEffectMono>(true);
+            rewardFly = GetComponentInChildren<RewardFlyEffectMono>(true);
+            walletView = GetComponentInChildren<WalletViewMono>(true);
 
             if (!controls || !wheelView || !spinAnimator
                 || !resultPanel || !hud || !rewardHud || !winEffect || !rewardFly

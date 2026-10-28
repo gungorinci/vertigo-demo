@@ -43,7 +43,7 @@ Assets/
   Scripts/
     Core/       Pure C# game rules, no UnityEngine (own assembly: Wheel.Core)
     Data/       ScriptableObject definitions
-    Game/       GameController and wheel rolling
+    Game/       GameControllerMono and wheel rolling
     UI/         Views: only display and input, no game rules
   Tests/
     EditMode/   NUnit tests for the Core rules
@@ -64,22 +64,22 @@ Three layers, so the rules can be tested without Unity:
 2. **Data** (ScriptableObjects, editable in the Inspector)
    - `RewardData`: one reward type (name, icon, is bomb).
    - `ZoneTypeData`: a zone type's interval, bomb rule, wheel and HUD texts.
-     A new zone type is a new asset in the GameController's list, no code change.
+     A new zone type is a new asset in the GameControllerMono's list, no code change.
    - `RandomSettings`: creates the game's random source. A seed other than 0
      replays the same spins, which helps when reproducing a bug.
    - `WheelConfig`: a wheel's sprites and its 8 slices. Each `WheelSlice` has
      a reward pool, an amount range and a weight. `RolledSlice` is one slice
      after its reward and amount are rolled.
 3. **Views / Game**
-   - `GameController` is the thin composition root: it wires the session,
+   - `GameControllerMono` is the thin composition root: it wires the session,
      the wheel views and the buttons together.
-   - Views (`WheelView`, `WheelSpinAnimator`, `HudView`, `RewardHudView`,
-     `ResultPanelView`, effects) only show what they are given.
+   - Views (`WheelViewMono`, `WheelSpinAnimatorMono`, `HudViewMono`, `RewardHudViewMono`,
+     `ResultPanelViewMono`, effects) only show what they are given.
    - Dependencies point one way: Game uses UI, Data and Core; UI uses Data
      and Core and never Game.
 
 **Spin flow:** the result is chosen first by `WeightedPicker`, then
-`WheelSpinAnimator` rotates the wheel so that slice stops under the pointer
+`WheelSpinAnimatorMono` rotates the wheel so that slice stops under the pointer
 (angles come from the slice count and the pointer's position, nothing is
 hard-coded to 45°). The animation never decides the result.
 

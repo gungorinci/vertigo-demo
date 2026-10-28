@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace VertigoDemo.UI
 {
-    public class WheelSliceView : MonoBehaviour
+    public class WheelSliceViewMono : MonoBehaviour
     {
         private const string IconName = "ui_image_slice_reward_value";
         private const string AmountTextName = "ui_text_slice_amount_value";

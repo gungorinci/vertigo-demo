@@ -4,14 +4,14 @@ using UnityEngine.UI;
 
 namespace VertigoDemo.UI
 {
-    public class WheelWinEffect : MonoBehaviour
+    public class WheelWinEffectMono : MonoBehaviour
     {
         private const string GlowName = "ui_image_win_glow";
         private const string FlashName = "ui_image_win_flash";
 
         [SerializeField, HideInInspector] private Image glow;
         [SerializeField, HideInInspector] private Image flash;
-        [SerializeField, HideInInspector] private WheelSliceView[] slices;
+        [SerializeField, HideInInspector] private WheelSliceViewMono[] slices;
 
         [SerializeField, Min(0.05f)] private float pulseDuration = 0.4f;
         [SerializeField, Min(0.05f)] private float flashDuration = 0.5f;
@@ -70,7 +70,7 @@ namespace VertigoDemo.UI
         {
             glow = transform.FindDeepComponent<Image>(GlowName);
             flash = transform.FindDeepComponent<Image>(FlashName);
-            slices = GetComponentsInChildren<WheelSliceView>(true);
+            slices = GetComponentsInChildren<WheelSliceViewMono>(true);
         }
 #endif
     }

@@ -8,23 +8,23 @@ using VertigoDemo.Data;
 
 namespace VertigoDemo.UI
 {
-    public class RewardHudView : MonoBehaviour
+    public class RewardHudViewMono : MonoBehaviour
     {
         private const string ContainerName = "ui_container_rewards";
         private const string ScrollName = "ui_scroll_rewards";
 
-        [SerializeField] private RewardBoxView boxPrefab;
+        [SerializeField] private RewardBoxViewMono boxPrefab;
         [SerializeField, HideInInspector] private RectTransform container;
         [SerializeField, HideInInspector] private ScrollRect scroll;
         [SerializeField, Min(0f)] private float revealDuration = 0.3f;
 
-        private readonly Dictionary<RewardData, RewardBoxView> boxes = new Dictionary<RewardData, RewardBoxView>();
+        private readonly Dictionary<RewardData, RewardBoxViewMono> boxes = new Dictionary<RewardData, RewardBoxViewMono>();
         private IEventBus _bus;
-        private ObjectPool<RewardBoxView> _boxPool;
+        private ObjectPool<RewardBoxViewMono> _boxPool;
 
         private void Awake()
         {
-            _boxPool = new ObjectPool<RewardBoxView>(CreateBox, OnGetBox, OnReleaseBox);
+            _boxPool = new ObjectPool<RewardBoxViewMono>(CreateBox, OnGetBox, OnReleaseBox);
         }
 
         public void Bind(IEventBus bus)
@@ -55,7 +55,7 @@ namespace VertigoDemo.UI
 
         private void SetReward(RewardData reward, int total)
         {
-            if (!boxes.TryGetValue(reward, out RewardBoxView box))
+            if (!boxes.TryGetValue(reward, out RewardBoxViewMono box))
             {
                 box = _boxPool.Get();
                 boxes.Add(reward, box);
@@ -65,7 +65,7 @@ namespace VertigoDemo.UI
 
         private void Clear()
         {
-            foreach (RewardBoxView box in boxes.Values)
+            foreach (RewardBoxViewMono box in boxes.Values)
             {
                 _boxPool.Release(box);
             }
@@ -74,20 +74,20 @@ namespace VertigoDemo.UI
 
         #region Pool
 
-        private RewardBoxView CreateBox()
+        private RewardBoxViewMono CreateBox()
         {
-            RewardBoxView box = Instantiate(boxPrefab, container);
+            RewardBoxViewMono box = Instantiate(boxPrefab, container);
             box.name = boxPrefab.name;
             return box;
         }
 
-        private void OnGetBox(RewardBoxView box)
+        private void OnGetBox(RewardBoxViewMono box)
         {
             box.gameObject.SetActive(true);
             box.transform.SetAsLastSibling();
         }
 
-        private void OnReleaseBox(RewardBoxView box)
+        private void OnReleaseBox(RewardBoxViewMono box)
         {
             box.gameObject.SetActive(false);
         }
@@ -97,7 +97,7 @@ namespace VertigoDemo.UI
         public void Reveal(RewardData reward)
         {
             float target = 1f;
-            RewardBoxView box;
+            RewardBoxViewMono box;
             if (boxes.TryGetValue(reward, out box))
             {
                 target = NormalizedPositionOf((RectTransform)box.transform);
@@ -121,7 +121,7 @@ namespace VertigoDemo.UI
 
         public Vector3 GetTargetPosition(RewardData reward)
         {
-            if (boxes.TryGetValue(reward, out RewardBoxView box)) return box.transform.position;
+            if (boxes.TryGetValue(reward, out RewardBoxViewMono box)) return box.transform.position;
 
             // A new box is appended at the right end of the container.
             var layout = container.GetComponent<HorizontalLayoutGroup>();

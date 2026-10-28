@@ -15,9 +15,9 @@ namespace VertigoDemo.Game
         private readonly ZoneSchedule<ZoneTypeData> _schedule;
         private readonly IRandomSource _random;
         private readonly SpinFlow _spinFlow;
-        private readonly WheelView _wheelView;
-        private readonly WheelWinEffect _winEffect;
-        private readonly HudView _hud;
+        private readonly WheelViewMono _wheelView;
+        private readonly WheelWinEffectMono _winEffect;
+        private readonly HudViewMono _hud;
 
         private bool _isIntroVisible;
 
@@ -27,9 +27,9 @@ namespace VertigoDemo.Game
             ZoneSchedule<ZoneTypeData> schedule,
             IRandomSource random,
             SpinFlow spinFlow,
-            WheelView wheelView,
-            WheelWinEffect winEffect,
-            HudView hud)
+            WheelViewMono wheelView,
+            WheelWinEffectMono winEffect,
+            HudViewMono hud)
         {
             _bus = bus;
             _session = session;

@@ -4,20 +4,20 @@ using VertigoDemo.Data;
 
 namespace VertigoDemo.UI
 {
-    public class WalletView : MonoBehaviour
+    public class WalletViewMono : MonoBehaviour
     {
         private const string CONTAINER_NAME = "ui_container_wallet";
 
-        [SerializeField] private WalletEntryView _entryPrefab;
+        [SerializeField] private WalletEntryViewMono _entryPrefab;
         [SerializeField, HideInInspector] private RectTransform _container;
 
-        private readonly Dictionary<RewardData, WalletEntryView> _entries = new Dictionary<RewardData, WalletEntryView>();
+        private readonly Dictionary<RewardData, WalletEntryViewMono> _entries = new Dictionary<RewardData, WalletEntryViewMono>();
 
         #region Public API
 
         public void Show(RewardData currency, int amount)
         {
-            WalletEntryView entry;
+            WalletEntryViewMono entry;
             if (!_entries.TryGetValue(currency, out entry))
             {
                 entry = Instantiate(_entryPrefab, _container);

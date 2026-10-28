@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace VertigoDemo.UI
 {
-    public class WalletEntryView : MonoBehaviour
+    public class WalletEntryViewMono : MonoBehaviour
     {
         private const string ICON_NAME = "ui_image_wallet_icon_value";
         private const string AMOUNT_TEXT_NAME = "ui_text_wallet_amount_value";

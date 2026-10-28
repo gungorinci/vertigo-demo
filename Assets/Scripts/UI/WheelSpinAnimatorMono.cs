@@ -6,7 +6,7 @@ using VertigoDemo.Core;
 namespace VertigoDemo.UI
 {
     [RequireComponent(typeof(AudioSource))]
-    public class WheelSpinAnimator : MonoBehaviour
+    public class WheelSpinAnimatorMono : MonoBehaviour
     {
         private const string WheelTransformName = "ui_animator_wheel";
         private const string PointerName = "ui_image_pointer_value";
