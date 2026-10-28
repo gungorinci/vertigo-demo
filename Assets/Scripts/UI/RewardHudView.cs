@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 using VertigoDemo.Core;
 using VertigoDemo.Data;
@@ -19,6 +20,12 @@ namespace VertigoDemo.UI
 
         private readonly Dictionary<RewardData, RewardBoxView> boxes = new Dictionary<RewardData, RewardBoxView>();
         private IEventBus _bus;
+        private ObjectPool<RewardBoxView> _boxPool;
+
+        private void Awake()
+        {
+            _boxPool = new ObjectPool<RewardBoxView>(CreateBox, OnGetBox, OnReleaseBox);
+        }
 
         public void Bind(IEventBus bus)
         {
@@ -50,8 +57,7 @@ namespace VertigoDemo.UI
         {
             if (!boxes.TryGetValue(reward, out RewardBoxView box))
             {
-                box = Instantiate(boxPrefab, container);
-                box.name = boxPrefab.name;
+                box = _boxPool.Get();
                 boxes.Add(reward, box);
             }
             box.Show(reward.Icon, total);
@@ -59,9 +65,34 @@ namespace VertigoDemo.UI
 
         private void Clear()
         {
-            foreach (RewardBoxView box in boxes.Values) Destroy(box.gameObject);
+            foreach (RewardBoxView box in boxes.Values)
+            {
+                _boxPool.Release(box);
+            }
             boxes.Clear();
         }
+
+        #region Pool
+
+        private RewardBoxView CreateBox()
+        {
+            RewardBoxView box = Instantiate(boxPrefab, container);
+            box.name = boxPrefab.name;
+            return box;
+        }
+
+        private void OnGetBox(RewardBoxView box)
+        {
+            box.gameObject.SetActive(true);
+            box.transform.SetAsLastSibling();
+        }
+
+        private void OnReleaseBox(RewardBoxView box)
+        {
+            box.gameObject.SetActive(false);
+        }
+
+        #endregion
 
         public void Reveal(RewardData reward)
         {
