@@ -76,6 +76,7 @@ namespace VertigoDemo.Game
         {
             if (!_session.CanSpin)
             {
+                Debug.LogWarning($"Spin request ignored while the session is {_session.State}.");
                 return;
             }
 

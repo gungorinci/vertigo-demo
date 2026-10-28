@@ -41,7 +41,10 @@ namespace VertigoDemo.UI
 
         public void Spin(int targetIndex, int sliceCount, IRandomSource random, Action onComplete)
         {
-            if (IsSpinning) return;
+            if (IsSpinning)
+            {
+                throw new InvalidOperationException("The wheel is already spinning.");
+            }
             _random = random;
 
             _onComplete = onComplete;

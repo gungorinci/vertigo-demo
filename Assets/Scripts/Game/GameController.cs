@@ -108,7 +108,11 @@ namespace VertigoDemo.Game
 
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
-            if (!session.CanLeave) return;
+            if (!session.CanLeave)
+            {
+                Debug.LogWarning($"Leave request ignored in zone {session.Zone} while the session is {session.State}.");
+                return;
+            }
 
             session.Leave();
         }
