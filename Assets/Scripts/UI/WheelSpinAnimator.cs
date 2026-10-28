@@ -32,6 +32,10 @@ namespace VertigoDemo.UI
 
         private Tween spinTween;
         private IRandomSource _random;
+        private float _pointerAngle;
+        private float _sliceAngle;
+        private float _targetAngle;
+        private Action _onComplete;
 
         public bool IsSpinning => spinTween != null && spinTween.IsActive();
 
@@ -40,30 +44,36 @@ namespace VertigoDemo.UI
             if (IsSpinning) return;
             _random = random;
 
-            float sliceAngle = 360f / sliceCount;
-            float offset = (random.Range(-1000, 1001) / 1000f) * maxOffsetInSlice * sliceAngle;
-            float targetAngle = sliceAngle * targetIndex - PointerAngle() + offset;
+            _onComplete = onComplete;
+            _sliceAngle = 360f / sliceCount;
+            _pointerAngle = PointerAngle();
+            float offset = (random.Range(-1000, 1001) / 1000f) * maxOffsetInSlice * _sliceAngle;
+            _targetAngle = _sliceAngle * targetIndex - _pointerAngle + offset;
 
             float current = wheelTransform.localEulerAngles.z;
-            float toTarget = Mathf.Repeat(current - targetAngle, 360f);   // clockwise distance
+            float toTarget = Mathf.Repeat(current - _targetAngle, 360f);   // clockwise distance
             float totalRotation = toTarget + fullTurns * 360f;
 
-            float pointerAngle = PointerAngle();
             lastEulerZ = current;
             unwrappedAngle = current;
-            lastSliceUnderPointer = SliceUnderPointer(pointerAngle, sliceAngle);
+            lastSliceUnderPointer = SliceUnderPointer(_pointerAngle, _sliceAngle);
 
             spinTween = wheelTransform
                 .DOLocalRotate(new Vector3(0f, 0f, -totalRotation), duration, RotateMode.LocalAxisAdd)
                 .SetEase(ease)
                 .SetLink(gameObject)
-                .OnUpdate(() => UpdateTicks(pointerAngle, sliceAngle))
-                .OnComplete(() =>
-                {
-                    wheelTransform.localEulerAngles = new Vector3(0f, 0f, targetAngle); // exact final angle
-                    spinTween = null;
-                    onComplete?.Invoke();
-                });
+                .OnUpdate(UpdateTicks)
+                .OnComplete(OnSpinComplete);
+        }
+
+        private void OnSpinComplete()
+        {
+            wheelTransform.localEulerAngles = new Vector3(0f, 0f, _targetAngle); // exact final angle
+            spinTween = null;
+            if (_onComplete != null)
+            {
+                _onComplete();
+            }
         }
 
         // Degrees clockwise from the top of the wheel to the pointer.
@@ -73,13 +83,13 @@ namespace VertigoDemo.UI
             return Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
         }
 
-        private void UpdateTicks(float pointerAngle, float sliceAngle)
+        private void UpdateTicks()
         {
             float eulerZ = wheelTransform.localEulerAngles.z;
             unwrappedAngle += Mathf.DeltaAngle(lastEulerZ, eulerZ);
             lastEulerZ = eulerZ;
 
-            int slice = SliceUnderPointer(pointerAngle, sliceAngle);
+            int slice = SliceUnderPointer(_pointerAngle, _sliceAngle);
             if (slice == lastSliceUnderPointer) return;
             lastSliceUnderPointer = slice;
 

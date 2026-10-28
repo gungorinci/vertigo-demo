@@ -29,9 +29,7 @@ namespace VertigoDemo.UI
             glow.gameObject.SetActive(true);
             glow.rectTransform.localScale = Vector3.zero;
             glow.rectTransform.DOScale(1f, 0.25f).SetEase(Ease.OutBack).SetLink(glow.gameObject)
-                .OnComplete(() => glow.rectTransform
-                    .DOScale(1.15f, pulseDuration).SetEase(Ease.InOutSine)
-                    .SetLoops(-1, LoopType.Yoyo).SetLink(glow.gameObject));
+                .OnComplete(StartGlowPulse);
 
             // Flash: grows and fades out once.
             flash.gameObject.SetActive(true);
@@ -40,6 +38,12 @@ namespace VertigoDemo.UI
             flash.color = new Color(c.r, c.g, c.b, 1f);
             flash.rectTransform.DOScale(1.4f, flashDuration).SetEase(Ease.OutQuad).SetLink(flash.gameObject);
             flash.DOFade(0f, flashDuration).SetLink(flash.gameObject);
+        }
+
+        private void StartGlowPulse()
+        {
+            glow.rectTransform.DOScale(1.15f, pulseDuration).SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo).SetLink(glow.gameObject);
         }
 
         public void Hide()

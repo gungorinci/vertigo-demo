@@ -15,10 +15,13 @@ namespace VertigoDemo.UI
         [SerializeField, Min(0.1f)] private float duration = 0.6f;
         [SerializeField] private float arcHeight = 200f;
 
+        private Action _onArrived;
+
         public void Fly(Sprite sprite, RectTransform from, Vector3 to, Action onArrived)
         {
             RectTransform rt = flyAnimator;
             rt.DOKill();
+            _onArrived = onArrived;
 
             flyImage.sprite = sprite;
             rt.position = from.position;
@@ -31,12 +34,17 @@ namespace VertigoDemo.UI
             DOTween.Sequence()
                 .Join(rt.DOPath(new[] { middle, to }, duration, PathType.CatmullRom).SetEase(Ease.InOutQuad))
                 .Join(rt.DOScale(0.6f, duration))
-                .OnComplete(() =>
-                {
-                    rt.gameObject.SetActive(false);
-                    onArrived?.Invoke();
-                })
+                .OnComplete(OnFlyComplete)
                 .SetLink(gameObject);
+        }
+
+        private void OnFlyComplete()
+        {
+            flyAnimator.gameObject.SetActive(false);
+            if (_onArrived != null)
+            {
+                _onArrived();
+            }
         }
 
 #if UNITY_EDITOR
