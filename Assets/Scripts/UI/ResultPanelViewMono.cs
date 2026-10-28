@@ -107,22 +107,11 @@ namespace VertigoDemo.UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _popup = transform.FindDeep(POPUP_NAME) as RectTransform;
-            _icon = FindComponent<Image>(ICON_NAME);
-            _title = FindComponent<TMP_Text>(TITLE_NAME);
-            _restartButton = FindComponent<Button>(RESTART_BUTTON_NAME);
-            _restartText = FindComponent<TMP_Text>(RESTART_TEXT_NAME);
-        }
-
-        private T FindComponent<T>(string childName) where T : Component
-        {
-            Transform child = transform.FindDeep(childName);
-            if (!child)
-            {
-                Debug.LogWarning($"{name}: child '{childName}' not found.", this);
-                return null;
-            }
-            return child.GetComponent<T>();
+            _popup = transform.FindDeepComponent<RectTransform>(POPUP_NAME);
+            _icon = transform.FindDeepComponent<Image>(ICON_NAME);
+            _title = transform.FindDeepComponent<TMP_Text>(TITLE_NAME);
+            _restartButton = transform.FindDeepComponent<Button>(RESTART_BUTTON_NAME);
+            _restartText = transform.FindDeepComponent<TMP_Text>(RESTART_TEXT_NAME);
         }
 #endif
     }

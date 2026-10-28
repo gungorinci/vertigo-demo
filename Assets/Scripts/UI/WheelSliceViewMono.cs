@@ -23,7 +23,7 @@ namespace VertigoDemo.UI
         public void Show(Sprite sprite, int amount)
         {
             _icon.sprite = sprite;
-            _amountText.text = "x" + amount;
+            _amountText.text = AmountFormatter.Format(amount);
         }
 
         #endregion

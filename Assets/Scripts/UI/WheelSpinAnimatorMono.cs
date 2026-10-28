@@ -132,8 +132,8 @@ namespace VertigoDemo.UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _wheelTransform = transform.FindDeep(WHEEL_TRANSFORM_NAME) as RectTransform;
-            _pointer = transform.FindDeep(POINTER_NAME) as RectTransform;
+            _wheelTransform = transform.FindDeepComponent<RectTransform>(WHEEL_TRANSFORM_NAME);
+            _pointer = transform.FindDeepComponent<RectTransform>(POINTER_NAME);
             _audioSource = GetComponent<AudioSource>();
 
             if (!_wheelTransform || !_pointer)

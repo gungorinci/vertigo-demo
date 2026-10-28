@@ -43,20 +43,9 @@ namespace VertigoDemo.UI
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _wheelImage = FindImage(WHEEL_IMAGE_NAME);
-            _pointerImage = FindImage(POINTER_IMAGE_NAME);
+            _wheelImage = transform.FindDeepComponent<Image>(WHEEL_IMAGE_NAME);
+            _pointerImage = transform.FindDeepComponent<Image>(POINTER_IMAGE_NAME);
             _sliceViews = GetComponentsInChildren<WheelSliceViewMono>(true);
-        }
-
-        private Image FindImage(string childName)
-        {
-            Transform child = transform.FindDeep(childName);
-            if (!child)
-            {
-                Debug.LogWarning($"{name}: child '{childName}' not found.", this);
-                return null;
-            }
-            return child.GetComponent<Image>();
         }
 #endif
     }

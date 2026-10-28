@@ -21,7 +21,7 @@ namespace VertigoDemo.UI
         public void Show(Sprite sprite, int total)
         {
             _icon.sprite = sprite;
-            _amountText.text = "x" + total;
+            _amountText.text = AmountFormatter.Format(total);
 
             _animator.DOKill(true);
             _animator.localScale = Vector3.one;
