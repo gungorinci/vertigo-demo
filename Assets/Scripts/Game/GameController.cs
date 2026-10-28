@@ -8,9 +8,7 @@ namespace VertigoDemo.Game
 {
     public class GameController : MonoBehaviour
     {
-        [SerializeField] private WheelConfig normalWheel;   // bronze, with the bomb
-        [SerializeField] private WheelConfig safeWheel;     // silver, every 5th zone
-        [SerializeField] private WheelConfig superWheel;    // gold, every 30th zone
+        [SerializeField] private List<ZoneTypeData> _zoneTypes = new List<ZoneTypeData>();
 
         [SerializeField, Min(0f)] private float resultDelay = 1f;
         [SerializeField, Min(0f)] private float flyDelay = 0.4f;
@@ -41,7 +39,7 @@ namespace VertigoDemo.Game
             spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
                 rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
             economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards());
-            zones = new ZonePresenter(bus, session, new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel),
+            zones = new ZonePresenter(bus, session, new ZoneSchedule<ZoneTypeData>(_zoneTypes),
                 random, spinFlow, wheelView, winEffect, hud);
             Subscribe();
             zones.ShowZone();
@@ -51,9 +49,9 @@ namespace VertigoDemo.Game
         private List<RewardData> CollectRewards()
         {
             var rewards = new List<RewardData>();
-            foreach (WheelConfig wheel in new[] { normalWheel, safeWheel, superWheel })
+            foreach (ZoneTypeData zoneType in _zoneTypes)
             {
-                foreach (WheelSlice slice in wheel.Slices)
+                foreach (WheelSlice slice in zoneType.Wheel.Slices)
                 {
                     foreach (RewardData reward in slice.RewardPool)
                     {

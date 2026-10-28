@@ -54,14 +54,17 @@ Assets/
 Three layers, so the rules can be tested without Unity:
 
 1. **Core** (`Wheel.Core` assembly, *No Engine References*)
-   - `ZoneRules`: zone type, bomb and leave rules.
+   - `ZoneSchedule<TZoneType>`: which zone type a zone is. The type with the
+     largest interval that divides the zone wins (30 beats 5 beats 1).
+   - `ZoneRules`: the leave rule.
    - `GameSession<TReward>`: zone, collected rewards and state
      (`Idle / Spinning / Lost / Left`), raises C# events on change.
    - `WeightedPicker` + `IRandomSource`: weighted slice choice with an
      injectable random source (deterministic in tests).
-   - `WheelSelector<TWheel>`: which wheel to use for a zone type.
 2. **Data** (ScriptableObjects, editable in the Inspector)
    - `RewardData`: one reward type (name, icon, is bomb).
+   - `ZoneTypeData`: a zone type's interval, bomb rule, wheel and HUD texts.
+     A new zone type is a new asset in the GameController's list, no code change.
    - `WheelConfig`: a wheel's sprites and its 8 slices. Each `WheelSlice` has
      a reward pool, an amount range and a weight.
 3. **Views / Game**

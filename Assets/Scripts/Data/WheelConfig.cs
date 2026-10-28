@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using VertigoDemo.Core;
 
 namespace VertigoDemo.Data
 {
@@ -9,7 +8,6 @@ namespace VertigoDemo.Data
     {
         private const int SLOT_COUNT = 8;
 
-        [SerializeField] private ZoneType _zoneType;
         [SerializeField] private Sprite wheelSprite;
         [SerializeField] private Sprite indicatorSprite;
         [SerializeField] private List<WheelSlice> slices = new List<WheelSlice>();
@@ -19,14 +17,26 @@ namespace VertigoDemo.Data
         public Sprite IndicatorSprite => indicatorSprite;
         public IReadOnlyList<WheelSlice> Slices => slices;
 
-        public ZoneType ZoneType
-        {
-            get { return _zoneType; }
-        }
-
         public float GrowthPerZone
         {
             get { return _growthPerZone; }
+        }
+
+        public int CountBombSlices()
+        {
+            int bombSlices = 0;
+            foreach (WheelSlice slice in slices)
+            {
+                foreach (RewardData reward in slice.RewardPool)
+                {
+                    if (reward && reward.IsBomb)
+                    {
+                        bombSlices++;
+                        break;
+                    }
+                }
+            }
+            return bombSlices;
         }
 
         #region Validation
@@ -39,7 +49,6 @@ namespace VertigoDemo.Data
                 LogProblem($"has {slices.Count} slices, the wheel has {SLOT_COUNT} slots.");
             }
 
-            int bombSlices = 0;
             for (int i = 0; i < slices.Count; i++)
             {
                 WheelSlice slice = slices[i];
@@ -63,24 +72,14 @@ namespace VertigoDemo.Data
                 {
                     LogProblem($"slice {i} has an empty reward pool.");
                 }
-                if (bombs > 0)
+                if (bombs > 0 && bombs != rewards)
                 {
-                    bombSlices++;
-                    if (bombs != rewards)
-                    {
-                        LogProblem($"slice {i} mixes the bomb with other rewards.");
-                    }
+                    LogProblem($"slice {i} mixes the bomb with other rewards.");
                 }
                 if (slice.MaxAmount < slice.MinAmount)
                 {
                     LogProblem($"slice {i} has Max Amount below Min Amount.");
                 }
-            }
-
-            int expectedBombSlices = ZoneRules.HasBomb(_zoneType) ? 1 : 0;
-            if (bombSlices != expectedBombSlices)
-            {
-                LogProblem($"a {_zoneType} wheel needs {expectedBombSlices} bomb slice(s), this one has {bombSlices}.");
             }
         }
 

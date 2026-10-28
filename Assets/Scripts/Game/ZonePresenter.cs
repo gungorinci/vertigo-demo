@@ -12,7 +12,7 @@ namespace VertigoDemo.Game
 
         private readonly IEventBus _bus;
         private readonly GameSession<RewardData> _session;
-        private readonly WheelSelector<WheelConfig> _wheels;
+        private readonly ZoneSchedule<ZoneTypeData> _schedule;
         private readonly IRandomSource _random;
         private readonly SpinFlow _spinFlow;
         private readonly WheelView _wheelView;
@@ -24,7 +24,7 @@ namespace VertigoDemo.Game
         public ZonePresenter(
             IEventBus bus,
             GameSession<RewardData> session,
-            WheelSelector<WheelConfig> wheels,
+            ZoneSchedule<ZoneTypeData> schedule,
             IRandomSource random,
             SpinFlow spinFlow,
             WheelView wheelView,
@@ -33,7 +33,7 @@ namespace VertigoDemo.Game
         {
             _bus = bus;
             _session = session;
-            _wheels = wheels;
+            _schedule = schedule;
             _random = random;
             _spinFlow = spinFlow;
             _wheelView = wheelView;
@@ -50,7 +50,7 @@ namespace VertigoDemo.Game
         {
             _winEffect.Hide();
 
-            WheelConfig config = _wheels.For(_session.ZoneType);
+            WheelConfig config = _schedule.For(_session.Zone).Wheel;
             List<RolledSlice> slices = WheelRoller.Roll(config, _session.Zone, _random);
             _wheelView.Show(config, slices);
             _spinFlow.SetSlices(slices, config.name);
@@ -63,7 +63,7 @@ namespace VertigoDemo.Game
             }
             else
             {
-                _hud.ShowZone(_session.Zone, _session.ZoneType);
+                ShowHud();
             }
         }
 
@@ -89,7 +89,25 @@ namespace VertigoDemo.Game
                 return;
             }
             _isIntroVisible = false;
-            _hud.ShowZone(_session.Zone, _session.ZoneType);
+            ShowHud();
+        }
+
+        #endregion
+
+        #region Hud
+
+        private void ShowHud()
+        {
+            int zone = _session.Zone;
+            ZoneTypeData type = _schedule.For(zone);
+            int nextZone;
+            if (type.HasInfo || !_schedule.TryFindNextSpecialZone(zone, out nextZone))
+            {
+                _hud.ShowZone(zone, type.Title, type.Info);
+                return;
+            }
+
+            _hud.ShowCountdown(zone, type.Title, _schedule.For(nextZone).DisplayName, nextZone - zone);
         }
 
         #endregion

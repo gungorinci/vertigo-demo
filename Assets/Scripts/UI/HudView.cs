@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using VertigoDemo.Core;
 
 namespace VertigoDemo.UI
 {
@@ -14,11 +13,21 @@ namespace VertigoDemo.UI
         [SerializeField, HideInInspector] private TMP_Text titleText;
         [SerializeField, HideInInspector] private TMP_Text infoText;
 
-        public void ShowZone(int zone, ZoneType type)
+        public void ShowZone(int zone, string title, string info)
         {
             zoneText.text = $"ZONE {zone}";
-            titleText.text = TitleFor(type);
-            infoText.text = InfoFor(zone, type);
+            titleText.text = title;
+            infoText.text = info;
+        }
+
+        public void ShowCountdown(int zone, string title, string nextZoneName, int spinsLeft)
+        {
+            string info = $"{nextZoneName} zone in {spinsLeft} spins";
+            if (spinsLeft == 1)
+            {
+                info = $"{nextZoneName} zone next!";
+            }
+            ShowZone(zone, title, info);
         }
 
         // Shown before the first spin of a run: the rules in one line.
@@ -27,23 +36,6 @@ namespace VertigoDemo.UI
             zoneText.text = $"ZONE {zone}";
             titleText.text = "SPIN TO WIN! REWARDS GROW EVERY ZONE";
             infoText.text = "<size=85%>Avoid the bomb! Every 5th zone is safe, every 30th is golden. Leave after any spin to keep it all.</size>";
-        }
-
-        private static string TitleFor(ZoneType type) => type switch
-        {
-            ZoneType.Safe => "SILVER SPIN",
-            ZoneType.Super => "GOLDEN SPIN",
-            _ => "BRONZE SPIN"
-        };
-
-        private static string InfoFor(int zone, ZoneType type)
-        {
-            if (type == ZoneType.Safe) return "SAFE ZONE: no bomb, better rewards";
-            if (type == ZoneType.Super) return "SUPER ZONE: no bomb, special rewards";
-
-            int spinsLeft = ZoneRules.SafeInterval - zone % ZoneRules.SafeInterval;
-            string next = ZoneRules.GetZoneType(zone + spinsLeft) == ZoneType.Super ? "Super" : "Safe";
-            return spinsLeft == 1 ? $"{next} zone next!" : $"{next} zone in {spinsLeft} spins";
         }
 
 #if UNITY_EDITOR

@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e98c6a5ac693a4ca7935ddf9f8a6df, type: 3}
   m_Name: Wheel_Bronze
   m_EditorClassIdentifier: 
-  _zoneType: 0
   wheelSprite: {fileID: 21300000, guid: 1a95a981e3bdd674cbd34c00f4dcfb08, type: 3}
   indicatorSprite: {fileID: 21300000, guid: e3df5b6b5dac87047b3a6d694455e40f, type: 3}
   slices:

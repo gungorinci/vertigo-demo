@@ -9,13 +9,32 @@ namespace VertigoDemo.Tests
         private const string Silver = "silver";
         private const string Gold = "gold";
 
-        private WheelSelector<string> wheels;
+        private class TestZoneType : IZoneType
+        {
+            public TestZoneType(string name, int interval, bool hasBomb)
+            {
+                Name = name;
+                Interval = interval;
+                HasBomb = hasBomb;
+            }
+
+            public string Name { get; }
+            public int Interval { get; }
+            public bool HasBomb { get; }
+        }
+
+        private ZoneSchedule<TestZoneType> schedule;
         private GameSession<string> session;
 
         [SetUp]
         public void SetUp()
         {
-            wheels = new WheelSelector<string>(Bronze, Silver, Gold);
+            schedule = new ZoneSchedule<TestZoneType>(new[]
+            {
+                new TestZoneType(Bronze, 1, true),
+                new TestZoneType(Silver, 5, false),
+                new TestZoneType(Gold, 30, false)
+            });
             session = new GameSession<string>(new EventBus());
         }
 
@@ -31,9 +50,41 @@ namespace VertigoDemo.Tests
             WinUntil(zone);
 
             Assert.AreEqual(zone, session.Zone);
-            Assert.AreEqual(expectedWheel, wheels.For(session.ZoneType));
-            Assert.AreEqual(hasBomb, ZoneRules.HasBomb(session.ZoneType));
+            Assert.AreEqual(expectedWheel, schedule.For(session.Zone).Name);
+            Assert.AreEqual(hasBomb, schedule.For(session.Zone).HasBomb);
             Assert.AreEqual(canLeave, session.CanLeave);
+        }
+
+        [TestCase(1, 5)]
+        [TestCase(5, 10)]
+        [TestCase(26, 30)]
+        public void NextSpecialZone_IsTheNextSilverOrGoldZone(int zone, int expectedZone)
+        {
+            int nextZone;
+
+            Assert.IsTrue(schedule.TryFindNextSpecialZone(zone, out nextZone));
+            Assert.AreEqual(expectedZone, nextZone);
+        }
+
+        [Test]
+        public void NewZoneType_NeedsNoCodeChange()
+        {
+            var withPlatinum = new ZoneSchedule<TestZoneType>(new[]
+            {
+                new TestZoneType(Bronze, 1, true),
+                new TestZoneType(Silver, 5, false),
+                new TestZoneType("platinum", 50, false)
+            });
+
+            Assert.AreEqual("platinum", withPlatinum.For(50).Name);
+            Assert.AreEqual(Silver, withPlatinum.For(55).Name);
+        }
+
+        [Test]
+        public void Schedule_NeedsATypeForEveryZone()
+        {
+            Assert.Throws<System.ArgumentException>(() =>
+                new ZoneSchedule<TestZoneType>(new[] { new TestZoneType(Silver, 5, false) }));
         }
 
         [Test]
@@ -73,7 +124,7 @@ namespace VertigoDemo.Tests
         {
             WinUntil(3);
 
-            Assert.AreEqual(ZoneType.Normal, session.ZoneType);
+            Assert.AreEqual(Bronze, schedule.For(session.Zone).Name);
             Assert.IsTrue(session.CanLeave);
 
             session.Leave();

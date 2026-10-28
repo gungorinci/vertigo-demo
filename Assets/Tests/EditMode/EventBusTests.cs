@@ -19,7 +19,7 @@ namespace VertigoDemo.Tests
             int receivedZone = 0;
             _bus.Subscribe<ZoneChangedEvent>(evt => receivedZone = evt.Zone);
 
-            _bus.Publish(new ZoneChangedEvent(7, ZoneType.Normal));
+            _bus.Publish(new ZoneChangedEvent(7));
 
             Assert.AreEqual(7, receivedZone);
         }
@@ -30,7 +30,7 @@ namespace VertigoDemo.Tests
             bool called = false;
             _bus.Subscribe<RewardsClearedEvent>(evt => called = true);
 
-            _bus.Publish(new ZoneChangedEvent(1, ZoneType.Normal));
+            _bus.Publish(new ZoneChangedEvent(1));
 
             Assert.IsFalse(called);
         }

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e33d2dcda53540cabd7ce7289e52fb32, type: 3}
+  m_Name: Zone_Normal
+  m_EditorClassIdentifier: 
+  _interval: 1
+  _hasBomb: 1
+  _wheel: {fileID: 11400000, guid: 9e8f0e802b8f3b3489abd1eb25e72707, type: 2}
+  _displayName: Normal
+  _title: BRONZE SPIN
+  _info: 

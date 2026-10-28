@@ -3,12 +3,10 @@ namespace VertigoDemo.Core
     public readonly struct ZoneChangedEvent
     {
         public readonly int Zone;
-        public readonly ZoneType ZoneType;
 
-        public ZoneChangedEvent(int zone, ZoneType zoneType)
+        public ZoneChangedEvent(int zone)
         {
             Zone = zone;
-            ZoneType = zoneType;
         }
     }
 

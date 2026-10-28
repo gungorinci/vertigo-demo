@@ -23,7 +23,6 @@ namespace VertigoDemo.Core
 
         public int Zone { get; private set; } = 1;
         public SessionState State { get; private set; } = SessionState.Idle;
-        public ZoneType ZoneType => ZoneRules.GetZoneType(Zone);
         public IReadOnlyDictionary<TReward, int> Collected => collected;
 
         public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
@@ -90,7 +89,7 @@ namespace VertigoDemo.Core
 
         private void PublishZone()
         {
-            _bus.Publish(new ZoneChangedEvent(Zone, ZoneType));
+            _bus.Publish(new ZoneChangedEvent(Zone));
         }
     }
 }
