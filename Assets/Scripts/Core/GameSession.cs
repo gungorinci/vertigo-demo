@@ -13,31 +13,54 @@ namespace VertigoDemo.Core
 
     public class GameSession<TReward>
     {
-        private readonly Dictionary<TReward, int> collected = new Dictionary<TReward, int>();
+        private readonly Dictionary<TReward, int> _collected = new Dictionary<TReward, int>();
+        private readonly IEventBus _bus;
+
+        public GameSession(IEventBus bus)
+        {
+            _bus = bus;
+        }
 
         public int Zone { get; private set; } = 1;
         public SessionState State { get; private set; } = SessionState.Idle;
-        public ZoneType ZoneType => ZoneRules.GetZoneType(Zone);
-        public IReadOnlyDictionary<TReward, int> Collected => collected;
 
-        public bool IsOver => State == SessionState.Lost || State == SessionState.Left;
-        public bool CanSpin => State == SessionState.Idle;
-        public bool CanLeave => !IsOver && ZoneRules.CanLeave(ZoneType, State == SessionState.Spinning);
+        public IReadOnlyDictionary<TReward, int> Collected
+        {
+            get { return _collected; }
+        }
 
-        public event Action<int> ZoneChanged;              // new zone
-        public event Action<TReward, int> RewardChanged;   // reward, new total
-        public event Action RewardsCleared;
-        public event Action<SessionState> StateChanged;
+        public bool IsOver
+        {
+            get { return State == SessionState.Lost || State == SessionState.Left; }
+        }
+
+        public bool CanSpin
+        {
+            get { return State == SessionState.Idle; }
+        }
+
+        public bool CanLeave
+        {
+            get { return !IsOver && ZoneRules.CanLeave(State == SessionState.Spinning, _collected.Count > 0); }
+        }
+
+        #region Public API
 
         public void BeginSpin()
         {
-            if (!CanSpin) throw new InvalidOperationException($"Cannot spin while {State}.");
+            if (!CanSpin)
+            {
+                throw new InvalidOperationException($"Cannot spin while {State}.");
+            }
             SetState(SessionState.Spinning);
         }
 
         public void CompleteSpin(TReward reward, int amount, bool isBomb)
         {
-            if (State != SessionState.Spinning) throw new InvalidOperationException("No spin in progress.");
+            if (State != SessionState.Spinning)
+            {
+                throw new InvalidOperationException("No spin in progress.");
+            }
 
             if (isBomb)
             {
@@ -46,19 +69,22 @@ namespace VertigoDemo.Core
                 return;
             }
 
-            collected.TryGetValue(reward, out int total);
+            _collected.TryGetValue(reward, out int total);
             total += amount;
-            collected[reward] = total;
-            RewardChanged?.Invoke(reward, total);
+            _collected[reward] = total;
+            _bus.Publish(new RewardChangedEvent<TReward>(reward, total));
 
             Zone++;
-            ZoneChanged?.Invoke(Zone);
+            PublishZone();
             SetState(SessionState.Idle);
         }
 
         public void Leave()
         {
-            if (!CanLeave) throw new InvalidOperationException($"Cannot leave in zone {Zone} while {State}.");
+            if (!CanLeave)
+            {
+                throw new InvalidOperationException($"Cannot leave in zone {Zone} while {State}.");
+            }
             SetState(SessionState.Left);
         }
 
@@ -66,20 +92,36 @@ namespace VertigoDemo.Core
         {
             ClearRewards();
             Zone = 1;
-            ZoneChanged?.Invoke(Zone);
+            PublishZone();
             SetState(SessionState.Idle);
         }
 
+        public void AnnounceState()
+        {
+            _bus.Publish(new SessionStateChangedEvent(State, CanSpin, CanLeave));
+        }
+
+        #endregion
+
+        #region Internals
+
         private void ClearRewards()
         {
-            collected.Clear();
-            RewardsCleared?.Invoke();
+            _collected.Clear();
+            _bus.Publish(new RewardsClearedEvent());
         }
 
         private void SetState(SessionState state)
         {
             State = state;
-            StateChanged?.Invoke(state);
+            AnnounceState();
         }
+
+        private void PublishZone()
+        {
+            _bus.Publish(new ZoneChangedEvent(Zone));
+        }
+
+        #endregion
     }
 }

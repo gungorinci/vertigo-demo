@@ -6,7 +6,9 @@ namespace VertigoDemo.Game
 {
     public static class WheelRoller
     {
-        public static List<RolledSlice> Roll(WheelConfig config, IRandomSource random)
+        #region Public API
+
+        public static List<RolledSlice> Roll(WheelConfig config, int zone, IRandomSource random)
         {
             var rolled = new List<RolledSlice>(config.Slices.Count);
 
@@ -17,19 +19,23 @@ namespace VertigoDemo.Game
                     : null;
 
                 int amount;
-                if (reward != null && reward.IsBomb)
+                if (reward && reward.IsBomb)
                 {
                     amount = 1; // a bomb has no amount, always shown as x1
                 }
                 else
                 {
                     int max = slice.MaxAmount < slice.MinAmount ? slice.MinAmount : slice.MaxAmount;
-                    amount = random.Range(slice.MinAmount, max + 1);
+                    int baseAmount = random.Range(slice.MinAmount, max + 1);
+                    amount = RewardScaling.ScaleAmount(baseAmount, zone, config.GrowthPerZone);
                 }
-                rolled.Add(new RolledSlice(reward, amount, slice.Weight));
+                int weight = reward ? slice.Weight : 0;
+                rolled.Add(new RolledSlice(reward, amount, weight));
             }
 
             return rolled;
         }
+
+        #endregion
     }
 }

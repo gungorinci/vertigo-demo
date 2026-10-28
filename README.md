@@ -2,8 +2,8 @@
 
 A risk-and-reward wheel game made for the Vertigo Games developer demo.
 The player spins a wheel zone after zone, collecting rewards. A bomb on the
-wheel takes everything collected so far; on safe and super zones the player
-can leave and keep it all.
+wheel takes everything collected so far; after any spin the player can leave
+and keep it all.
 
 - **Unity:** 6000.3.23f1
 - **Platform:** Android (APK in [Releases](https://github.com/gungorinci/vertigo-demo/releases))
@@ -20,15 +20,15 @@ can leave and keep it all.
 
 ## Rules
 
-| Zone | Wheel | Bomb | Can leave |
-|---|---|---|---|
-| Normal | Bronze | Yes | No |
-| Every 5th (safe) | Silver | No | Yes |
-| Every 30th (super) | Gold, special rewards | No | Yes |
+| Zone | Wheel | Bomb |
+|---|---|---|
+| Normal | Bronze | Yes |
+| Every 5th (safe) | Silver | No |
+| Every 30th (super) | Gold, special rewards | No |
 
 - Hitting the bomb loses all collected rewards; the game can be restarted.
-- Leaving is only allowed while the wheel is not spinning and the zone is safe
-  or super (`ZoneRules.CanLeave`, the rule lives in one place).
+- The player can leave whenever the wheel is not spinning and at least one
+  reward has been collected (`ZoneRules.CanLeave`, the rule lives in one place).
 - Zones are endless; the wheel type is decided only by the zone number.
 
 ## Project structure
@@ -43,7 +43,7 @@ Assets/
   Scripts/
     Core/       Pure C# game rules, no UnityEngine (own assembly: Wheel.Core)
     Data/       ScriptableObject definitions
-    Game/       GameController and wheel rolling
+    Game/       GameControllerMono and wheel rolling
     UI/         Views: only display and input, no game rules
   Tests/
     EditMode/   NUnit tests for the Core rules
@@ -54,24 +54,32 @@ Assets/
 Three layers, so the rules can be tested without Unity:
 
 1. **Core** (`Wheel.Core` assembly, *No Engine References*)
-   - `ZoneRules`: zone type, bomb and leave rules.
+   - `ZoneSchedule<TZoneType>`: which zone type a zone is. The type with the
+     largest interval that divides the zone wins (30 beats 5 beats 1).
+   - `ZoneRules`: the leave rule.
    - `GameSession<TReward>`: zone, collected rewards and state
      (`Idle / Spinning / Lost / Left`), raises C# events on change.
    - `WeightedPicker` + `IRandomSource`: weighted slice choice with an
      injectable random source (deterministic in tests).
-   - `WheelSelector<TWheel>`: which wheel to use for a zone type.
 2. **Data** (ScriptableObjects, editable in the Inspector)
    - `RewardData`: one reward type (name, icon, is bomb).
+   - `ZoneTypeData`: a zone type's interval, bomb rule, wheel and HUD texts.
+     A new zone type is a new asset in the GameControllerMono's list, no code change.
+   - `RandomSettings`: creates the game's random source. A seed other than 0
+     replays the same spins, which helps when reproducing a bug.
    - `WheelConfig`: a wheel's sprites and its 8 slices. Each `WheelSlice` has
-     a reward pool, an amount range and a weight.
+     a reward pool, an amount range and a weight. `RolledSlice` is one slice
+     after its reward and amount are rolled.
 3. **Views / Game**
-   - `GameController` is the thin composition root: it wires the session,
+   - `GameControllerMono` is the thin composition root: it wires the session,
      the wheel views and the buttons together.
-   - Views (`WheelView`, `WheelSpinAnimator`, `HudView`, `RewardHudView`,
-     `ResultPanelView`, effects) only show what they are given.
+   - Views (`WheelViewMono`, `WheelSpinAnimatorMono`, `HudViewMono`, `RewardHudViewMono`,
+     `ResultPanelViewMono`, effects) only show what they are given.
+   - Dependencies point one way: Game uses UI, Data and Core; UI uses Data
+     and Core and never Game.
 
 **Spin flow:** the result is chosen first by `WeightedPicker`, then
-`WheelSpinAnimator` rotates the wheel so that slice stops under the pointer
+`WheelSpinAnimatorMono` rotates the wheel so that slice stops under the pointer
 (angles come from the slice count and the pointer's position, nothing is
 hard-coded to 45°). The animation never decides the result.
 

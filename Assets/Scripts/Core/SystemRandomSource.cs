@@ -4,16 +4,24 @@ namespace VertigoDemo.Core
 {
     public class SystemRandomSource : IRandomSource
     {
-        private readonly Random random;
+        private readonly Random _random;
 
-        public SystemRandomSource() : this(Environment.TickCount) { }
+        public SystemRandomSource() : this(Environment.TickCount)
+        {
+        }
 
         public SystemRandomSource(int seed)
         {
-            random = new Random(seed);
+            _random = new Random(seed);
         }
 
-        public int Range(int minInclusive, int maxExclusive) =>
-            random.Next(minInclusive, maxExclusive);
+        #region IRandomSource
+
+        public int Range(int minInclusive, int maxExclusive)
+        {
+            return _random.Next(minInclusive, maxExclusive);
+        }
+
+        #endregion
     }
 }

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 02db2f14faccde241aea1bbcc7b6129e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - spinButton: {instanceID: 0}
+  - wheelView: {instanceID: 0}
+  - spinAnimator: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

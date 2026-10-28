@@ -60,3 +60,4 @@ MonoBehaviour:
     minAmount: 5
     maxAmount: 15
     weight: 10
+  _growthPerZone: 0.08

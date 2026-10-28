@@ -1,0 +1,52 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+using VertigoDemo.Data;
+
+namespace VertigoDemo.UI
+{
+    public class WheelViewMono : MonoBehaviour
+    {
+        private const string WHEEL_IMAGE_NAME = "ui_image_spin_wheel_value";
+        private const string POINTER_IMAGE_NAME = "ui_image_pointer_value";
+
+        [SerializeField, HideInInspector, FormerlySerializedAs("wheelImage")] private Image _wheelImage;
+        [SerializeField, HideInInspector, FormerlySerializedAs("pointerImage")] private Image _pointerImage;
+        [SerializeField, HideInInspector, FormerlySerializedAs("sliceViews")] private WheelSliceViewMono[] _sliceViews;
+
+        #region Public API
+
+        public void Show(WheelConfig config, IReadOnlyList<RolledSlice> slices)
+        {
+            _wheelImage.sprite = config.WheelSprite;
+            _pointerImage.sprite = config.IndicatorSprite;
+
+            for (int i = 0; i < _sliceViews.Length && i < slices.Count; i++)
+            {
+                RolledSlice slice = slices[i];
+                if (!slice.Reward)
+                {
+                    continue;
+                }
+                _sliceViews[i].Show(slice.Reward.Icon, slice.Amount);
+            }
+        }
+
+        public RectTransform GetSliceIcon(int index)
+        {
+            return _sliceViews[index].IconTransform;
+        }
+
+        #endregion
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            _wheelImage = transform.FindDeepComponent<Image>(WHEEL_IMAGE_NAME);
+            _pointerImage = transform.FindDeepComponent<Image>(POINTER_IMAGE_NAME);
+            _sliceViews = GetComponentsInChildren<WheelSliceViewMono>(true);
+        }
+#endif
+    }
+}
