@@ -27,17 +27,13 @@ namespace VertigoDemo.Game
 
         private readonly IRandomSource random = new SystemRandomSource();
         private readonly IEventBus bus = new EventBus();
-        private List<RolledSlice> currentSlices;
         private GameSession<RewardData> session;
-        private WheelConfig currentConfig;
-        private WheelSelector<WheelConfig> wheels;
-        private bool showIntro = true;
         private SpinFlow spinFlow;
         private EconomyPresenter economy;
+        private ZonePresenter zones;
 
         private void Start()
         {
-            wheels = new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel);
             session = new GameSession<RewardData>(bus);
             resultPanel.Bind(bus);
             controls.Bind(bus);
@@ -45,8 +41,10 @@ namespace VertigoDemo.Game
             spinFlow = new SpinFlow(bus, session, random, wheelView, spinAnimator, winEffect,
                 rewardHud, rewardFly, gameObject, resultDelay, flyDelay);
             economy = new EconomyPresenter(bus, session, new FileSaveStore(), walletView, CollectRewards());
+            zones = new ZonePresenter(bus, session, new WheelSelector<WheelConfig>(normalWheel, safeWheel, superWheel),
+                random, spinFlow, wheelView, winEffect, hud);
             Subscribe();
-            ShowZone();
+            zones.ShowZone();
             session.AnnounceState();
         }
 
@@ -71,18 +69,14 @@ namespace VertigoDemo.Game
 
         private void Subscribe()
         {
-            bus.Subscribe<ZoneChangedEvent>(OnZoneChanged);
             bus.Subscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Subscribe<LeaveRequestedEvent>(OnLeaveRequested);
-            bus.Subscribe<SpinStartedEvent>(OnSpinStarted);
         }
 
         private void OnDestroy()
         {
-            bus.Unsubscribe<ZoneChangedEvent>(OnZoneChanged);
             bus.Unsubscribe<RestartRequestedEvent>(OnRestartRequested);
             bus.Unsubscribe<LeaveRequestedEvent>(OnLeaveRequested);
-            bus.Unsubscribe<SpinStartedEvent>(OnSpinStarted);
             if (spinFlow != null)
             {
                 spinFlow.Dispose();
@@ -91,30 +85,11 @@ namespace VertigoDemo.Game
             {
                 economy.Dispose();
             }
-        }
-
-        private void ShowZone()
-        {
-            winEffect.Hide();
-            currentConfig = wheels.For(session.ZoneType);
-            currentSlices = WheelRoller.Roll(currentConfig, session.Zone, random);
-            wheelView.Show(currentConfig, currentSlices);
-            spinFlow.SetSlices(currentSlices, currentConfig.name);
-            if (showIntro) hud.ShowIntro(session.Zone);
-            else hud.ShowZone(session.Zone, session.ZoneType);
-        }
-
-        private void OnSpinStarted(SpinStartedEvent evt)
-        {
-            if (!showIntro)
+            if (zones != null)
             {
-                return;
+                zones.Dispose();
             }
-            showIntro = false;
-            hud.ShowZone(session.Zone, session.ZoneType);
         }
-
-        private void OnZoneChanged(ZoneChangedEvent evt) => ShowZone();
 
         private void OnLeaveRequested(LeaveRequestedEvent evt)
         {
@@ -125,7 +100,6 @@ namespace VertigoDemo.Game
 
         private void OnRestartRequested(RestartRequestedEvent evt)
         {
-            showIntro = true;
             session.Restart();
         }
 
