@@ -26,9 +26,14 @@ and keep it all.
 | Every 5th (safe) | Silver | No |
 | Every 30th (super) | Gold, special rewards | No |
 
+- Reward amounts grow 8% per zone (`RewardScaling`, set per wheel).
+- A normal wheel has exactly one bomb slice, safe and super wheels have none;
+  `WheelConfig.OnValidate` logs an error otherwise. Empty slices are never picked.
 - Hitting the bomb loses all collected rewards; the game can be restarted.
 - The player can leave whenever the wheel is not spinning and at least one
   reward has been collected (`ZoneRules.CanLeave`, the rule lives in one place).
+- Leaving moves the collected rewards into the wallet, which is saved to
+  `save.json` and loaded on the next start.
 - Zones are endless; the wheel type is decided only by the zone number.
 
 ## Project structure
@@ -37,14 +42,14 @@ and keep it all.
 Assets/
   Art/          Atlases, Backgrounds, Rewards, UI, VFX, Wheel (sprites)
   Audio/        Wheel tick sound
-  Data/         ScriptableObject assets: Rewards/, Wheels/
-  Prefabs/      Reusable UI prefabs (reward box)
+  Data/         ScriptableObject assets: Rewards/, Wheels/, Zones/, RandomSettings
+  Prefabs/      Reusable UI prefabs (reward box, wallet box)
   Scenes/       Wheel scene
   Scripts/
     Core/       Pure C# game rules, no UnityEngine (own assembly: Wheel.Core)
     Data/       ScriptableObject definitions
-    Game/       GameControllerMono and wheel rolling
-    UI/         Views: only display and input, no game rules
+    Game/       GameControllerMono, spin flow, presenters, save
+    UI/         Views: only display and input, no game rules; UiTexts, UiEffects
   Tests/
     EditMode/   NUnit tests for the Core rules
 ```
@@ -56,9 +61,12 @@ Three layers, so the rules can be tested without Unity:
 1. **Core** (`Wheel.Core` assembly, *No Engine References*)
    - `ZoneSchedule<TZoneType>`: which zone type a zone is. The type with the
      largest interval that divides the zone wins (30 beats 5 beats 1).
-   - `ZoneRules`: the leave rule.
+   - `ZoneRules`: the leave rule. `RewardScaling`: the amount growth per zone.
+   - `EventBus`: typed publish/subscribe, one event struct per change.
    - `GameSession<TReward>`: zone, collected rewards and state
-     (`Idle / Spinning / Lost / Left`), raises C# events on change.
+     (`Idle / Spinning / Lost / Left`), publishes its changes on the bus.
+   - `Inventory<TItem>`: the wallet the rewards go into on leave, saved
+     through `ISaveStore`.
    - `WeightedPicker` + `IRandomSource`: weighted slice choice with an
      injectable random source (deterministic in tests).
 2. **Data** (ScriptableObjects, editable in the Inspector)
@@ -71,8 +79,12 @@ Three layers, so the rules can be tested without Unity:
      a reward pool, an amount range and a weight. `RolledSlice` is one slice
      after its reward and amount are rolled.
 3. **Views / Game**
-   - `GameControllerMono` is the thin composition root: it wires the session,
-     the wheel views and the buttons together.
+   - `GameControllerMono` is the thin composition root: it creates the bus,
+     the session and the presenters and hands them the views.
+   - `SpinFlow` runs a spin: roll, animate, apply the result. Rejected spin
+     and leave requests are logged, a second spin while spinning throws.
+   - `EconomyPresenter` (inventory, save, wallet) and `ZonePresenter`
+     (zone setup, intro, countdown) listen to the bus.
    - Views (`WheelViewMono`, `WheelSpinAnimatorMono`, `HudViewMono`, `RewardHudViewMono`,
      `ResultPanelViewMono`, effects) only show what they are given.
    - Dependencies point one way: Game uses UI, Data and Core; UI uses Data
@@ -103,6 +115,12 @@ hard-coded to 45°). The animation never decides the result.
     in hidden serialized fields; clicks are bound in code with `AddListener`.
     No OnClick or event wiring in the Inspector.
   - Buttons and frames use Sliced sprites; images keep their aspect ratio.
+- **Pooling:** reward boxes come from an `ObjectPool` and are released on
+  when the rewards are cleared instead of destroyed.
+- **Code standard:** `Mono` suffix on MonoBehaviours, `_camelCase` fields,
+  `SCREAMING_SNAKE_CASE` constants, `Is/Has/Can` bools, block bodies, regions,
+  `if (obj)` for Unity objects. Texts and effect values live in `UiTexts` and
+  `UiEffects`.
 - **Aspect ratios:** checked at 20:9 (2400×1080), 16:9 (1920×1080) and 4:3 (1600×1200).
 
 ## Tests
@@ -112,3 +130,5 @@ hard-coded to 45°). The animation never decides the result.
 `ZoneProgressionTests` plays winning spins from code up to zones 1, 2, 5, 6,
 30, 60 and 65 and checks the wheel, the bomb and the leave rule at each one,
 plus reward totals, bomb/restart and leaving on a normal zone.
+`EventBusTests`, `InventoryTests` and `RewardScalingTests` cover the bus, the
+wallet and the amount growth.
